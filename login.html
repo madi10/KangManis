@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KangManis - Login</title>
+    <script src="assets/tailwind.js"></script>
+    <script src="assets/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body{background:#0f172a}
+        .glass{background:rgba(30,41,59,.7);backdrop-filter:blur(20px);border:1px solid rgba(51,65,85,.5)}
+        .glow{box-shadow:0 0 40px rgba(59,130,246,.15),0 20px 60px rgba(0,0,0,.4)}
+        .input-focus:focus{box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .anim{animation:fadeUp .5s ease-out}
+        @keyframes pulse-ring{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.4);opacity:0}}
+        .pulse-ring{animation:pulse-ring 2s ease-out infinite}
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 font-sans antialiased text-white">
+
+    <!-- Background Decoration -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative w-full max-w-md anim">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/25 mb-4 relative">
+                <i data-lucide="hard-drive" class="w-10 h-10 text-white"></i>
+                <div class="absolute inset-0 rounded-2xl bg-blue-500/20 pulse-ring"></div>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">KangManis</h1>
+            <p class="text-sm text-slate-400 mt-1">Backup & Storage Jaringan Lokal</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass rounded-2xl p-8 glow">
+            <form id="loginForm" class="space-y-5">
+                <!-- Username -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Username</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                        <input type="text" id="username" autocomplete="username" placeholder="Masukkan username"
+                            class="w-full bg-dark-900 border border-dark-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 input-focus transition-all">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                        <input type="password" id="password" autocomplete="current-password" placeholder="Masukkan password"
+                            class="w-full bg-dark-900 border border-dark-700 rounded-xl pl-11 pr-12 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 input-focus transition-all">
+                        <button type="button" onclick="togglePw()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                            <i data-lucide="eye" class="w-4 h-4" id="pwIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="btnText">Masuk</span>
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden" id="btnSpinner"></i>
+                </button>
+
+                <!-- Error -->
+                <div id="errorBox" class="hidden bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-center text-sm text-red-400"></div>
+            </form>
+
+            <div class="mt-6 pt-5 border-t border-dark-700 text-center">
+                <p class="text-xs text-slate-500">Default: <span class="text-slate-400 font-mono">admin</span> / <span class="text-slate-400 font-mono">admin123</span></p>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-slate-600 mt-6">KangManis v3.0</p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePw() {
+            const pw = document.getElementById('password');
+            const icon = document.getElementById('pwIcon');
+            if (pw.type === 'password') { pw.type = 'text'; icon.setAttribute('data-lucide', 'eye-off'); }
+            else { pw.type = 'password'; icon.setAttribute('data-lucide', 'eye'); }
+            lucide.createIcons();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorBox = document.getElementById('errorBox');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            errorBox.classList.add('hidden');
+            submitBtn.disabled = true;
+            btnText.textContent = '';
+            btnSpinner.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value.trim(),
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+                if (data.success) window.location.href = '/';
+                else { errorBox.textContent = data.message || 'Login gagal'; errorBox.classList.remove('hidden'); }
+            } catch {
+                errorBox.textContent = 'Koneksi error, coba lagi';
+                errorBox.classList.remove('hidden');
+            }
+            submitBtn.disabled = false;
+            btnText.textContent = 'Masuk';
+            btnSpinner.classList.add('hidden');
+        });
+
+        document.getElementById('username').focus();
+    </script>
+</body>
+</html>

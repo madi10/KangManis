@@ -1,0 +1,15 @@
+{
+  "appName": "KangManis",
+  "port": 8080,
+  "maxUploadSize": 500,
+  "imageQuality": 80,
+  "imageSizes": {
+    "thumbnail": 200,
+    "preview": 1920
+  },
+  "baseDir": "/sdcard/Download/KangManis",
+  "sessionSecret": "droidstorage-secret-change-me-2024",
+  "theme": "dark",
+  "telegramBotToken": "",
+  "telegramChatId": ""
+}

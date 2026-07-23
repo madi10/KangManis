@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KangManis</title>
+    <script src="assets/tailwind.js"></script>
+    <script src="assets/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { dark: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617' }}}}
+        }
+    </script>
+    <style>
+        .glass{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border:1px solid rgba(51,65,85,.4)}
+        .scrollbar::-webkit-scrollbar{width:4px}
+        .scrollbar::-webkit-scrollbar-track{background:transparent}
+        .scrollbar::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
+        .drop-active{border-color:#3b82f6!important;background:rgba(59,130,246,.05)!important}
+        .drop-hover{border-color:#3b82f6!important;background:rgba(59,130,246,.1)!important}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .anim-in{animation:fadeUp .25s ease-out}
+        @keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+        .slide-up{animation:slideUp .3s ease-out}
+
+        html.light body{background:#f1f5f9;color:#1e293b}
+        html.light .glass{background:rgba(255,255,255,.75);border-color:rgba(226,232,240,.8)}
+        html.light .scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1}
+
+        html.light .bg-dark-950{background-color:#f1f5f9}
+        html.light .bg-dark-900{background-color:#e2e8f0}
+        html.light .bg-dark-900\/80{background-color:rgba(226,232,240,.8)}
+        html.light .bg-dark-900\/50{background-color:rgba(226,232,240,.5)}
+        html.light .bg-dark-800{background-color:#e2e8f0}
+        html.light .bg-dark-800\/50{background-color:rgba(226,232,240,.5)}
+        html.light .bg-dark-800\/80{background-color:rgba(226,232,240,.8)}
+        html.light .bg-dark-700{background-color:#cbd5e1}
+
+        html.light .text-white{color:#1e293b}
+        html.light .text-dark-300{color:#475569}
+        html.light .text-dark-400{color:#64748b}
+        html.light .text-dark-500{color:#94a3b8}
+        html.light .text-dark-600{color:#cbd5e1}
+
+        html.light .border-dark-700{border-color:#e2e8f0}
+        html.light .border-dark-700\/50{border-color:rgba(226,232,240,.5)}
+        html.light .border-dark-700\/30{border-color:rgba(226,232,240,.3)}
+
+        html.light .hover\:bg-dark-800:hover{background-color:#e2e8f0}
+        html.light .hover\:bg-dark-800\/50:hover{background-color:rgba(226,232,240,.5)}
+        html.light .hover\:bg-dark-700:hover{background-color:#cbd5e1}
+        html.light .hover\:bg-red-500\/10:hover{background-color:rgba(239,68,68,.08)}
+
+        html.light .placeholder-dark-500::placeholder{color:#94a3b8}
+        html.light .placeholder-dark-400::placeholder{color:#94a3b8}
+        html.light [class*="placeholder-"][class*="slate"]::placeholder{color:#94a3b8}
+    </style>
+</head>
+<body class="min-h-screen bg-dark-950 text-white font-sans antialiased flex flex-col">
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden">
+    <div class="glass rounded-xl px-5 py-3 flex items-center gap-3 shadow-2xl slide-up">
+        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400" id="toastIcon"></i>
+        <span class="text-sm font-medium" id="toastText"></span>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="sticky top-0 z-40 glass border-b border-dark-700/50">
+    <div class="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i data-lucide="hard-drive" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight">KangManis</h1>
+                <p class="text-[10px] text-dark-400">Masuk sebagai <span class="text-blue-400 font-semibold" id="currentUser">-</span>
+                    <span id="roleBadge" class="hidden ml-1 text-[9px] bg-blue-500/15 text-blue-400 px-1.5 py-0.5 rounded font-bold">ADMIN</span>
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openModal('sharesModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Share Links">
+                <i data-lucide="link" class="w-4 h-4 text-dark-400"></i>
+            </button>
+            <button id="adminBtn" onclick="openModal('usersModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors hidden" title="Kelola User">
+                <i data-lucide="users" class="w-4 h-4 text-dark-400"></i>
+            </button>
+            <button onclick="sendTelegramReport()" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Kirim Laporan ke Telegram">
+                <i data-lucide="send" class="w-4 h-4 text-dark-400"></i>
+            </button>
+            <button onclick="openModal('changePassModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Ganti Password">
+                <i data-lucide="key" class="w-4 h-4 text-dark-400"></i>
+            </button>
+            <button onclick="toggleTheme()" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Toggle Theme">
+                <i data-lucide="sun" class="w-4 h-4 text-dark-400 hidden" id="iconSun"></i>
+                <i data-lucide="moon" class="w-4 h-4 text-dark-400" id="iconMoon"></i>
+            </button>
+            <a href="/logout" class="p-2 rounded-xl border border-dark-700 hover:bg-red-500/10 hover:border-red-500/30 transition-colors" title="Keluar">
+                <i data-lucide="log-out" class="w-4 h-4 text-dark-400 hover:text-red-400"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main -->
+<main class="max-w-[1400px] w-full mx-auto p-4 flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
+
+    <!-- Sidebar -->
+    <aside class="space-y-4">
+        <!-- Storage -->
+        <div class="glass rounded-2xl p-5 anim-in">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-[11px] font-bold text-dark-400 uppercase tracking-wider">Kapasitas</h2>
+                <span class="text-[11px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full" id="storagePercent">0%</span>
+            </div>
+            <div class="w-full bg-dark-900 rounded-full h-2 mb-3">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500" id="storageBar" style="width:0%"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-dark-900/50 rounded-xl py-2.5 px-2 border border-dark-700/50">
+                    <div class="text-[10px] text-dark-500 mb-0.5">Terpakai</div>
+                    <div class="text-sm font-bold" id="storageUsed">-</div>
+                </div>
+                <div class="bg-dark-900/50 rounded-xl py-2.5 px-2 border border-dark-700/50">
+                    <div class="text-[10px] text-dark-500 mb-0.5">Sisa</div>
+                    <div class="text-sm font-bold text-emerald-400" id="storageAvail">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="glass rounded-2xl p-5 anim-in" style="animation-delay:.05s">
+            <h2 class="text-[11px] font-bold text-dark-400 uppercase tracking-wider mb-3">Statistik</h2>
+            <div class="space-y-2.5">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="folder" class="w-4 h-4 text-amber-400"></i> Folder</span>
+                    <strong id="statFolders" class="font-bold">0</strong>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="file" class="w-4 h-4 text-blue-400"></i> File</span>
+                    <strong id="statFiles" class="font-bold">0</strong>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="database" class="w-4 h-4 text-purple-400"></i> Total</span>
+                    <strong id="statTotal" class="font-bold">0 B</strong>
+                </div>
+                <div class="flex items-center justify-between text-sm pt-2 border-t border-dark-700/50">
+                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="link" class="w-4 h-4 text-cyan-400"></i> Shares</span>
+                    <strong id="statShares" class="font-bold">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="glass rounded-2xl p-5 space-y-2.5 anim-in" style="animation-delay:.1s">
+            <button onclick="triggerUpload()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 active:scale-[.98]">
+                <i data-lucide="cloud-upload" class="w-4 h-4"></i> Unggah File
+            </button>
+            <button onclick="triggerFolderUpload()" class="w-full border border-dark-700 hover:bg-dark-800 font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                <i data-lucide="folder-input" class="w-4 h-4 text-dark-400"></i> Unggah Folder
+            </button>
+            <button onclick="openModal('mkdirModal')" class="w-full border border-dark-700 hover:bg-dark-800 font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                <i data-lucide="folder-plus" class="w-4 h-4 text-dark-400"></i> Folder Baru
+            </button>
+            <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect()">
+            <input type="file" id="folderInput" webkitdirectory multiple style="display:none" onchange="handleFileSelect()">
+        </div>
+    </aside>
+
+    <!-- Explorer -->
+    <section class="flex flex-col gap-4 min-h-0">
+        <!-- Search + Toolbar -->
+        <div class="glass rounded-2xl p-4 anim-in" style="animation-delay:.05s">
+            <div class="relative mb-3">
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500"></i>
+                <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="Cari file atau folder..."
+                    class="w-full bg-dark-900/80 border border-dark-700 rounded-xl pl-11 pr-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-1 text-xs overflow-x-auto scrollbar py-1 flex-1 min-w-0">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-blue-400 shrink-0"></i>
+                    <div class="flex items-center gap-0.5 font-mono" id="breadcrumb"></div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button id="selectModeBtn" onclick="toggleSelectMode()" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Pilih Banyak">
+                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-dark-400"></i>
+                    </button>
+                    <button onclick="openModal('sortModal')" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Urutkan">
+                        <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-dark-400"></i>
+                    </button>
+                    <button onclick="loadFiles()" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Refresh">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-dark-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div id="dropZone" class="hidden border-2 border-dashed border-dark-700 rounded-2xl p-10 text-center transition-all">
+            <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-blue-500/50 mb-3"></i>
+            <p class="text-sm text-dark-400">Seret & lepas file di sini</p>
+        </div>
+
+        <!-- Progress -->
+        <div id="progressArea" class="hidden glass rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium flex items-center gap-2">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-400"></i>
+                    <span id="progressText">Mengunggah...</span>
+                </span>
+                <span class="text-sm font-bold text-blue-400" id="progressPercent">0%</span>
+            </div>
+            <div class="w-full bg-dark-900 rounded-full h-1.5 mb-2">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all" id="progressBar" style="width:0%"></div>
+            </div>
+            <p class="text-[11px] text-dark-500" id="progressDetail"></p>
+        </div>
+
+        <!-- File List -->
+        <div class="glass rounded-2xl border border-dark-700/50 overflow-hidden flex-1 flex flex-col min-h-[400px]">
+            <div class="flex-1 overflow-y-auto scrollbar" id="fileList">
+                <div class="p-12 text-center text-dark-500">
+                    <i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-3 animate-spin"></i>
+                    <p class="text-sm">Memuat...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Batch Bar -->
+<div id="batchBar" class="fixed bottom-0 left-0 right-0 z-50 hidden slide-up">
+    <div class="glass border-t border-dark-700/50 px-6 py-3">
+        <div class="max-w-[1400px] mx-auto flex items-center justify-center gap-4">
+            <span class="text-sm font-medium"><strong id="batchCount" class="text-blue-400">0</strong> dipilih</span>
+            <button onclick="batchMove()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="move" class="w-3.5 h-3.5"></i> Pindah
+            </button>
+            <button onclick="batchDelete()" class="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
+            </button>
+            <button onclick="batchHash()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Hash
+            </button>
+            <button onclick="batchCompress()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="image" class="w-3.5 h-3.5 text-emerald-400"></i> Kompres
+            </button>
+            <button onclick="toggleSelectMode()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold transition-colors">Batal</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Upload Confirm -->
+<div id="uploadConfirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('uploadConfirmModal')">
+    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="cloud-upload" class="w-5 h-5 text-blue-400"></i></div>
+            <div><h3 class="font-bold text-sm">Konfirmasi Upload</h3><p class="text-xs text-dark-400" id="uploadCountText">0 file</p></div>
+        </div>
+        <label class="flex items-center gap-2.5 mb-3 cursor-pointer">
+            <input type="checkbox" id="compressCheck" class="w-4 h-4 rounded accent-blue-500">
+            <span class="text-xs text-dark-400">Kompres gambar saat upload</span>
+        </label>
+        <div class="max-h-48 overflow-y-auto scrollbar space-y-1 mb-5 text-xs text-dark-300" id="uploadFileList"></div>
+        <div class="flex gap-3">
+            <button onclick="closeModal('uploadConfirmModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="confirmUpload()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Upload</button>
+        </div>
+    </div>
+</div>
+
+<!-- Mkdir -->
+<div id="mkdirModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('mkdirModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><i data-lucide="folder-plus" class="w-5 h-5 text-amber-400"></i></div>
+            <h3 class="font-bold text-sm">Folder Baru</h3>
+        </div>
+        <input type="text" id="folderNameInput" placeholder="Nama folder..." onkeydown="if(event.key==='Enter')submitMkdir()"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <div class="flex gap-3">
+            <button onclick="closeModal('mkdirModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitMkdir()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Buat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rename -->
+<div id="renameModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('renameModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="pencil" class="w-5 h-5 text-blue-400"></i></div>
+            <h3 class="font-bold text-sm">Ubah Nama</h3>
+        </div>
+        <input type="text" id="newNameInput" onkeydown="if(event.key==='Enter')submitRename()"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <input type="hidden" id="renamePath">
+        <div class="flex gap-3">
+            <button onclick="closeModal('renameModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitRename()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Terapkan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete -->
+<div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('deleteModal')">
+    <div class="glass rounded-2xl max-w-xs w-full p-6 text-center anim-in">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-7 h-7 text-red-400"></i></div>
+        <h3 class="font-bold text-sm mb-1">Hapus Permanen?</h3>
+        <p class="text-xs text-dark-400 mb-5">Item: <span id="deleteName" class="font-semibold text-red-400">-</span></p>
+        <input type="hidden" id="deletePath">
+        <div class="flex gap-3">
+            <button onclick="closeModal('deleteModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitDelete()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors">Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- Move/Copy -->
+<div id="moveModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('moveModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center"><i data-lucide="move" class="w-5 h-5 text-purple-400"></i></div>
+            <h3 class="font-bold text-sm">Pindah / Salin</h3>
+        </div>
+        <input type="text" id="moveTargetInput" placeholder="Path tujuan (contoh: FolderBaru)" onkeydown="if(event.key==='Enter')submitAction('move')"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <input type="hidden" id="moveSource">
+        <div class="flex gap-3">
+            <button onclick="closeModal('moveModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitAction('copy')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin</button>
+            <button onclick="submitAction('move')" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Pindah</button>
+        </div>
+    </div>
+</div>
+
+<!-- Compress -->
+<div id="compressModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('compressModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center"><i data-lucide="image" class="w-5 h-5 text-emerald-400"></i></div>
+            <div><h3 class="font-bold text-sm">Kompres Gambar</h3><p class="text-xs text-dark-400" id="compressName">-</p></div>
+        </div>
+        <label class="block text-xs text-dark-500 mb-1.5">Kualitas (10-100)</label>
+        <input type="number" id="compressQuality" value="75" min="10" max="100"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <input type="hidden" id="compressPath">
+        <div class="flex gap-3">
+            <button onclick="closeModal('compressModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitCompress()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors">Kompres</button>
+        </div>
+    </div>
+</div>
+
+<!-- Share -->
+<div id="shareModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('shareModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center"><i data-lucide="link" class="w-5 h-5 text-cyan-400"></i></div>
+            <div><h3 class="font-bold text-sm">Share File</h3><p class="text-xs text-dark-400" id="shareName">-</p></div>
+        </div>
+        <label class="block text-xs text-dark-500 mb-1.5">Berlaku selama (jam, 0 = selamanya)</label>
+        <input type="number" id="shareExpiry" value="24" min="0"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-3">
+        <input type="hidden" id="sharePath">
+        <div id="shareResult" class="hidden bg-dark-900 border border-dark-700 rounded-xl px-4 py-3 text-xs font-mono text-blue-400 break-all mb-4 cursor-pointer hover:border-blue-500/50 transition-colors" onclick="copyShareLink()"></div>
+        <div class="flex gap-3">
+            <button onclick="closeModal('shareModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+            <button onclick="submitShare()" class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold transition-colors">Generate</button>
+        </div>
+    </div>
+</div>
+
+<!-- Info -->
+<div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('infoModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="info" class="w-5 h-5 text-blue-400"></i></div>
+            <h3 class="font-bold text-sm">Informasi File</h3>
+        </div>
+        <div id="infoContent" class="text-xs text-dark-300 max-h-64 overflow-y-auto scrollbar mb-5 space-y-2"></div>
+        <button onclick="closeModal('infoModal')" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- Users -->
+<div id="usersModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('usersModal')">
+    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-blue-400"></i></div>
+            <h3 class="font-bold text-sm">Kelola User</h3>
+        </div>
+        <div id="usersList" class="max-h-48 overflow-y-auto scrollbar space-y-2 mb-5"></div>
+        <div class="border-t border-dark-700/50 pt-4 space-y-3">
+            <input type="text" id="newUsername" placeholder="Username baru..." class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
+            <input type="password" id="newPassword" placeholder="Password..." class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
+            <select id="newRole" class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
+                <option value="user">User</option><option value="admin">Admin</option>
+            </select>
+            <button onclick="createUser()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">Tambah User</button>
+        </div>
+        <button onclick="closeModal('usersModal')" class="w-full mt-3 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- Shares List -->
+<div id="sharesModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('sharesModal')">
+    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center"><i data-lucide="link" class="w-5 h-5 text-cyan-400"></i></div>
+            <h3 class="font-bold text-sm">Share Links Aktif</h3>
+        </div>
+        <div id="sharesList" class="max-h-64 overflow-y-auto scrollbar space-y-2 mb-5"></div>
+        <button onclick="closeModal('sharesModal')" class="w-full py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- Sort -->
+<div id="sortModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('sortModal')">
+    <div class="glass rounded-2xl max-w-xs w-full p-5 anim-in">
+        <h3 class="font-bold text-sm mb-4 flex items-center gap-2"><i data-lucide="arrow-up-down" class="w-4 h-4 text-blue-400"></i> Urutkan</h3>
+        <div class="space-y-1.5" id="sortOptions">
+            <button onclick="setSort('name_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Nama A → Z</button>
+            <button onclick="setSort('name_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Nama Z → A</button>
+            <button onclick="setSort('size_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Ukuran kecil → besar</button>
+            <button onclick="setSort('size_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Ukuran besar → kecil</button>
+            <button onclick="setSort('date_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Terbaru</button>
+            <button onclick="setSort('date_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Terlama</button>
+        </div>
+        <button onclick="closeModal('sortModal')" class="w-full mt-3 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- Change Password -->
+<div id="changePassModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('changePassModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><i data-lucide="key" class="w-5 h-5 text-amber-400"></i></div>
+            <h3 class="font-bold text-sm">Ganti Username & Password</h3>
+        </div>
+        <input type="text" id="changeUsername" placeholder="Username baru (kosongkan jika tidak ganti)"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-3">
+        <input type="password" id="changeCurrentPass" placeholder="Password saat ini"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-3">
+        <input type="password" id="changeNewPass" placeholder="Password baru"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <div class="flex gap-3">
+            <button onclick="closeModal('changePassModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitChangePassword()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Compress Confirm -->
+<div id="batchCompressModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('batchCompressModal')">
+    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center"><i data-lucide="image" class="w-5 h-5 text-emerald-400"></i></div>
+            <div><h3 class="font-bold text-sm">Kompres Batch</h3><p class="text-xs text-dark-400" id="batchCompressCount">0 gambar</p></div>
+        </div>
+        <label class="block text-xs text-dark-500 mb-1.5">Kualitas (10-100)</label>
+        <input type="number" id="batchCompressQuality" value="75" min="10" max="100"
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-4">
+        <div class="flex gap-3">
+            <button onclick="closeModal('batchCompressModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
+            <button onclick="submitBatchCompress()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors">Kompres</button>
+        </div>
+    </div>
+</div>
+
+<!-- Preview -->
+<div id="previewOverlay" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4" onclick="closePreview()">
+    <button onclick="closePreview()" class="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <img id="previewImg" src="" class="max-w-full max-h-[85vh] object-contain rounded-xl" onclick="event.stopPropagation()">
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+let currentPath = '', pendingFiles = [], sort = 'name_asc', selectMode = false, selectedPaths = new Set();
+let currentUserData = null, searchTimer = null;
+
+async function init() {
+    try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (!data.success) return window.location.href = '/login';
+        currentUserData = data.user;
+        document.getElementById('currentUser').textContent = data.user.username;
+        if (data.user.role === 'admin') {
+            document.getElementById('adminBtn').classList.remove('hidden');
+            document.getElementById('roleBadge').classList.remove('hidden');
+        }
+    } catch { return window.location.href = '/login'; }
+    if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        document.getElementById('iconMoon').classList.add('hidden');
+        document.getElementById('iconSun').classList.remove('hidden');
+    }
+    loadFiles();
+    setupDragDrop();
+}
+
+function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    document.documentElement.classList.toggle('dark', !isLight);
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    document.getElementById('iconMoon').classList.toggle('hidden', isLight);
+    document.getElementById('iconSun').classList.toggle('hidden', !isLight);
+}
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); lucide.createIcons(); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function encode(p) {
+    if (!p || p === '/') return '';
+    return btoa(p.replace(/^\/+|\/+$/g, '')).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+function decode(p) {
+    if (!p) return '';
+    try { let b = p.replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '='; return decodeURIComponent(escape(atob(b))); }
+    catch { try { let b = p.replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '='; return atob(b); } catch { return ''; } }
+}
+function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+function toast(msg) {
+    const el = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 2500);
+}
+
+function getFileIcon(name, isFolder) {
+    if (isFolder) return 'folder';
+    const ext = name.split('.').pop().toLowerCase();
+    const map = { jpg:'image',jpeg:'image',png:'image',gif:'image',webp:'image',bmp:'image',svg:'image',
+        mp4:'film',mkv:'film',avi:'film',mov:'film',
+        mp3:'music',wav:'music',flac:'music',
+        pdf:'file-text',doc:'file-text',docx:'file-text',txt:'file-text',md:'file-text',
+        xls:'table',xlsx:'table',csv:'table',
+        zip:'archive',rar:'archive','7z':'archive',tar:'archive',
+        js:'code',ts:'code',py:'code',java:'code',html:'globe',css:'palette',
+        json:'file-json',xml:'file-code',apk:'smartphone',exe:'cog',iso:'disc' };
+    return map[ext] || 'file';
+}
+function getFileColor(name, isFolder) {
+    if (isFolder) return 'text-amber-400';
+    const ext = name.split('.').pop().toLowerCase();
+    if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(ext)) return 'text-pink-400';
+    if (/\.(mp4|mkv|avi|mov)$/i.test(ext)) return 'text-red-400';
+    if (/\.(mp3|wav|flac|ogg)$/i.test(ext)) return 'text-purple-400';
+    if (/\.(zip|rar|7z|tar)$/i.test(ext)) return 'text-yellow-400';
+    if (/\.(js|ts|py|java|html|css)$/i.test(ext)) return 'text-green-400';
+    if (/\.(pdf)$/i.test(ext)) return 'text-red-400';
+    return 'text-blue-400';
+}
+function isImage(name) { return /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(name); }
+
+async function loadFiles() {
+    const container = document.getElementById('fileList');
+    container.innerHTML = '<div class="p-12 text-center text-dark-500"><i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-3 animate-spin"></i></div>';
+    try {
+        const res = await fetch('/api/files?path=' + encodeURIComponent(encode(currentPath)));
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        document.getElementById('statFiles').textContent = data.stats.files;
+        document.getElementById('statFolders').textContent = data.stats.folders;
+        document.getElementById('statTotal').textContent = data.stats.totalSizeFormatted;
+        if (data.storage) {
+            document.getElementById('storagePercent').textContent = data.storage.percent + '%';
+            document.getElementById('storageBar').style.width = data.storage.percent + '%';
+            document.getElementById('storageUsed').textContent = data.storage.used;
+            document.getElementById('storageAvail').textContent = data.storage.avail;
+        }
+        updateBreadcrumb(data.currentPath || '/');
+        let items = data.items;
+        items.sort((a, b) => {
+            if (a.isFolder && !b.isFolder) return -1;
+            if (!a.isFolder && b.isFolder) return 1;
+            switch (sort) {
+                case 'name_asc': return a.name.localeCompare(b.name);
+                case 'name_desc': return b.name.localeCompare(a.name);
+                case 'size_asc': return a.size - b.size;
+                case 'size_desc': return b.size - a.size;
+                case 'date_asc': return a.mtime - b.mtime;
+                case 'date_desc': return b.mtime - a.mtime;
+            }
+            return 0;
+        });
+        let html = '';
+        if (currentPath) {
+            const parent = currentPath.split('/').slice(0, -1).join('/');
+            html += `<div class="flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 cursor-pointer border-b border-dark-700/30 transition-colors" onclick="navigateTo('${encode(parent)}')">
+                <div class="w-9 h-9 rounded-lg bg-dark-800 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-dark-400"></i></div>
+                <span class="text-sm font-medium text-dark-400">Kembali</span></div>`;
+        }
+        items.forEach(item => {
+            const checked = selectedPaths.has(item.path);
+            const icon = getFileIcon(item.name, item.isFolder);
+            const color = getFileColor(item.name, item.isFolder);
+            const actions = buildActions(item);
+            html += `<div class="file-row flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 border-b border-dark-700/30 transition-colors ${checked ? 'bg-blue-500/5' : ''}" onclick="${item.isFolder ? `navigateTo('${item.path}')` : (isImage(item.name) ? `openPreview('${item.path}')` : '')}">
+                ${selectMode ? `<input type="checkbox" ${checked ? 'checked' : ''} class="w-4 h-4 accent-blue-500 cursor-pointer shrink-0" onclick="event.stopPropagation();toggleSelect('${item.path}')">` : ''}
+                <div class="w-9 h-9 rounded-lg bg-dark-800/80 flex items-center justify-center shrink-0"><i data-lucide="${icon}" class="w-4 h-4 ${color}"></i></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">${esc(item.name)}</p>
+                    <p class="text-[11px] text-dark-500">${item.sizeFormatted}${item.hash ? ' <span class="inline-flex items-center gap-0.5 text-emerald-500" title="Hash verified"><i data-lucide="shield-check" class="w-2.5 h-2.5"></i></span>' : ''}</p>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">${actions}</div>
+            </div>`;
+        });
+        if (!items.length && !currentPath) html = '<div class="p-16 text-center text-dark-500"><i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Folder kosong</p><p class="text-xs text-dark-600 mt-1">Mulai upload file!</p></div>';
+        if (!items.length && currentPath) html = '<div class="p-12 text-center text-dark-500"><p class="text-sm">Folder kosong</p></div>';
+        container.innerHTML = html;
+        lucide.createIcons();
+    } catch (e) { container.innerHTML = `<div class="p-12 text-center text-red-400"><p class="text-sm">${esc(e.message)}</p></div>`; }
+}
+
+function buildActions(item) {
+    let a = '';
+    const p = item.path;
+    const n = esc(item.name);
+    if (!item.isFolder) {
+        if (isImage(item.name)) a += `<button onclick="event.stopPropagation();openPreview('${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Preview"><i data-lucide="eye" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
+        a += `<button onclick="event.stopPropagation();verifyFile('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Verifikasi"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i></button>`;
+        a += `<a href="/api/download?path=${encodeURIComponent(p)}" onclick="event.stopPropagation()" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5 text-dark-400"></i></a>`;
+        if (isImage(item.name)) a += `<button onclick="event.stopPropagation();openCompressModal('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Kompres"><i data-lucide="image" class="w-3.5 h-3.5 text-emerald-400"></i></button>`;
+        a += `<button onclick="event.stopPropagation();openShareModal('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Share"><i data-lucide="link" class="w-3.5 h-3.5 text-cyan-400"></i></button>`;
+    }
+    a += `<button onclick="event.stopPropagation();openMoveModal('${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Pindah/Salin"><i data-lucide="move" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
+    a += `<button onclick="event.stopPropagation();openRenameModal('${n}','${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Rename"><i data-lucide="pencil" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
+    a += `<button onclick="event.stopPropagation();openDeleteModal('${n}','${p}')" class="p-2 rounded-lg hover:bg-red-500/10 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>`;
+    return a;
+}
+
+function updateBreadcrumb(p) {
+    const parts = p.split('/').filter(Boolean);
+    let html = `<span onclick="navigateTo('')" class="px-2 py-1 rounded-md hover:bg-dark-800 cursor-pointer transition-colors ${!parts.length ? 'text-blue-400 font-semibold' : 'text-dark-500'}">/</span>`;
+    let acc = '';
+    parts.forEach(part => {
+        acc += (acc ? '/' : '') + part;
+        html += `<i data-lucide="chevron-right" class="w-3 h-3 text-dark-600 shrink-0"></i><span onclick="navigateTo('${encode(acc)}')" class="px-2 py-1 rounded-md hover:bg-dark-800 cursor-pointer transition-colors ${acc === p ? 'text-blue-400 font-semibold' : 'text-dark-500'}">${esc(part)}</span>`;
+    });
+    document.getElementById('breadcrumb').innerHTML = html;
+    lucide.createIcons();
+}
+
+function navigateTo(enc) { currentPath = decode(enc); selectedPaths.clear(); if (selectMode) toggleSelectMode(); loadFiles(); }
+
+function setupDragDrop() {
+    const zone = document.getElementById('dropZone');
+    let dragCounter = 0;
+    document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; zone.classList.remove('hidden'); zone.classList.add('drop-active'); });
+    document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if (dragCounter <= 0) { dragCounter = 0; zone.classList.add('hidden'); zone.classList.remove('drop-active'); } });
+    document.addEventListener('dragover', e => e.preventDefault());
+    document.addEventListener('drop', e => { e.preventDefault(); dragCounter = 0; zone.classList.add('hidden'); zone.classList.remove('drop-active'); if (e.dataTransfer.files.length) { pendingFiles = Array.from(e.dataTransfer.files); showUploadConfirm(); } });
+}
+
+function triggerUpload() { document.getElementById('fileInput').click(); }
+function triggerFolderUpload() { document.getElementById('folderInput').click(); }
+function handleFileSelect() {
+    const fi = document.getElementById('fileInput'), fo = document.getElementById('folderInput');
+    const files = fi.files.length ? fi.files : fo.files;
+    if (!files.length) return;
+    pendingFiles = Array.from(files);
+    showUploadConfirm();
+    fi.value = ''; fo.value = '';
+}
+
+function showUploadConfirm() {
+    document.getElementById('uploadCountText').textContent = pendingFiles.length + ' file';
+    let html = '';
+    pendingFiles.forEach(f => { html += `<div class="flex items-center gap-2 py-1.5"><i data-lucide="${getFileIcon(f.name, false)}" class="w-3.5 h-3.5 ${getFileColor(f.name, false)} shrink-0"></i><span class="truncate">${esc(f.webkitRelativePath || f.name)}</span><span class="text-dark-600 shrink-0 ml-auto">${(f.size / 1024 / 1024).toFixed(2)} MB</span></div>`; });
+    document.getElementById('uploadFileList').innerHTML = html;
+    openModal('uploadConfirmModal');
+}
+
+async function confirmUpload() {
+    closeModal('uploadConfirmModal');
+    const area = document.getElementById('progressArea');
+    area.classList.remove('hidden');
+    const compress = document.getElementById('compressCheck').checked;
+    const total = pendingFiles.length;
+    let completed = 0;
+    for (let i = 0; i < total; i++) {
+        const f = pendingFiles[i];
+        const form = new FormData();
+        form.append('files', f, f.webkitRelativePath || f.name);
+        form.append('path', encode(currentPath));
+        if (compress) form.append('compress', 'true');
+        try {
+            await new Promise((resolve) => {
+                const xhr = new XMLHttpRequest();
+                xhr.upload.onprogress = e => {
+                    if (e.lengthComputable) {
+                        const pct = Math.round(((completed + e.loaded / e.total) / total) * 100);
+                        document.getElementById('progressPercent').textContent = pct + '%';
+                        document.getElementById('progressBar').style.width = pct + '%';
+                        document.getElementById('progressText').textContent = `Mengunggah ${i + 1}/${total}`;
+                        document.getElementById('progressDetail').textContent = f.name;
+                    }
+                };
+                xhr.onload = () => { completed++; resolve(); };
+                xhr.onerror = () => { completed++; resolve(); };
+                xhr.open('POST', '/api/upload');
+                xhr.send(form);
+            });
+        } catch { completed++; }
+    }
+    document.getElementById('progressPercent').textContent = '100%';
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressText').textContent = 'Selesai!';
+    document.getElementById('progressDetail').textContent = total + ' file berhasil diunggah';
+    pendingFiles = [];
+    toast('Upload berhasil!');
+    setTimeout(() => { area.classList.add('hidden'); loadFiles(); }, 1500);
+}
+
+async function submitMkdir() {
+    const name = document.getElementById('folderNameInput').value.trim();
+    if (!name) return toast('Masukkan nama folder');
+    try {
+        const res = await fetch('/api/mkdir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: encode(currentPath), name }) });
+        const data = await res.json();
+        if (data.success) { closeModal('mkdirModal'); document.getElementById('folderNameInput').value = ''; loadFiles(); toast('Folder dibuat!'); }
+        else toast(data.message);
+    } catch (e) { toast(e.message); }
+}
+
+function openRenameModal(name, p) { document.getElementById('newNameInput').value = name; document.getElementById('renamePath').value = p; openModal('renameModal'); setTimeout(() => document.getElementById('newNameInput').focus(), 100); }
+async function submitRename() {
+    const name = document.getElementById('newNameInput').value.trim();
+    if (!name) return toast('Masukkan nama baru');
+    try {
+        const res = await fetch('/api/rename', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('renamePath').value, newName: name }) });
+        const data = await res.json();
+        if (data.success) { closeModal('renameModal'); loadFiles(); toast('Berhasil di-rename!'); } else toast(data.message);
+    } catch (e) { toast(e.message); }
+}
+
+function openDeleteModal(name, p) { document.getElementById('deleteName').textContent = name; document.getElementById('deletePath').value = p; openModal('deleteModal'); }
+async function submitDelete() {
+    try {
+        const res = await fetch('/api/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('deletePath').value }) });
+        const data = await res.json();
+        if (data.success) { closeModal('deleteModal'); loadFiles(); toast('Dihapus!'); } else toast(data.message);
+    } catch (e) { toast(e.message); }
+}
+
+function openMoveModal(p) { document.getElementById('moveSource').value = p; document.getElementById('moveTargetInput').value = ''; openModal('moveModal'); }
+async function submitAction(action) {
+    const dest = document.getElementById('moveTargetInput').value.trim();
+    if (!dest) return toast('Masukkan path tujuan');
+    try {
+        const res = await fetch('/api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: document.getElementById('moveSource').value, destination: encode(dest) }) });
+        const data = await res.json();
+        if (data.success) { closeModal('moveModal'); loadFiles(); toast(action === 'move' ? 'Dipindah!' : 'Disalin!'); } else toast(data.message);
+    } catch (e) { toast(e.message); }
+}
+
+async function verifyFile(p, name) {
+    try {
+        const res = await fetch('/api/verify?path=' + encodeURIComponent(p));
+        const d = await res.json();
+        const statusColor = d.status === 'valid' ? 'text-emerald-400' : d.status === 'corrupted' ? 'text-red-400' : 'text-amber-400';
+        const statusText = d.status === 'valid' ? 'Aman' : d.status === 'corrupted' ? 'Rusak' : 'Belum di-scan';
+        const statusBg = d.status === 'valid' ? 'bg-emerald-500/10' : d.status === 'corrupted' ? 'bg-red-500/10' : 'bg-amber-500/10';
+        let html = `<div class="bg-dark-800 rounded-xl p-3 mb-3"><div class="font-semibold text-sm mb-1">${esc(name)}</div><span class="inline-flex items-center gap-1 text-xs font-bold ${statusColor} ${statusBg} px-2 py-1 rounded-lg">${statusText}</span></div>`;
+        if (d.originalHash) { html += `<div class="bg-dark-800 rounded-xl p-3 mb-2"><div class="text-[10px] text-dark-500 mb-1">Hash Asli</div><code class="text-[10px] break-all text-dark-300">${d.originalHash}</code></div>`; html += `<div class="bg-dark-800 rounded-xl p-3 mb-2"><div class="text-[10px] text-dark-500 mb-1">Hash Saat Ini</div><code class="text-[10px] break-all text-dark-300">${d.currentHash}</code></div>`; }
+        if (d.uploadedBy) html += `<div class="text-dark-500 text-xs">Oleh <strong class="text-dark-300">${d.uploadedBy}</strong> &bull; ${new Date(d.uploadedAt).toLocaleString('id-ID')}</div>`;
+        document.getElementById('infoContent').innerHTML = html;
+        openModal('infoModal');
+    } catch (e) { toast(e.message); }
+}
+
+function openPreview(p) { document.getElementById('previewImg').src = '/api/preview?path=' + encodeURIComponent(p); document.getElementById('previewOverlay').classList.remove('hidden'); }
+function closePreview() { document.getElementById('previewOverlay').classList.add('hidden'); }
+
+function openCompressModal(p, name) { document.getElementById('compressName').textContent = name; document.getElementById('compressPath').value = p; openModal('compressModal'); }
+async function submitCompress() {
+    try {
+        const res = await fetch('/api/compress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('compressPath').value, quality: parseInt(document.getElementById('compressQuality').value) || 75 }) });
+        const d = await res.json();
+        if (d.success) { toast('Hemat ' + d.savedFormatted); closeModal('compressModal'); loadFiles(); } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+
+function openShareModal(p, name) { document.getElementById('shareName').textContent = name; document.getElementById('sharePath').value = p; document.getElementById('shareResult').classList.add('hidden'); openModal('shareModal'); }
+async function submitShare() {
+    try {
+        const res = await fetch('/api/share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('sharePath').value, expiresIn: parseInt(document.getElementById('shareExpiry').value) || 0 }) });
+        const d = await res.json();
+        if (d.success) { const el = document.getElementById('shareResult'); el.textContent = d.url; el.classList.remove('hidden'); toast('Link dibuat! Klik untuk copy'); } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+function copyShareLink() { navigator.clipboard.writeText(document.getElementById('shareResult').textContent).then(() => toast('Link disalin!')); }
+
+function toggleSelectMode() {
+    selectMode = !selectMode;
+    selectedPaths.clear();
+    document.getElementById('selectModeBtn').classList.toggle('bg-blue-600/20', selectMode);
+    if (!selectMode) document.getElementById('batchBar').classList.add('hidden');
+    loadFiles();
+}
+function toggleSelect(p) { if (selectedPaths.has(p)) selectedPaths.delete(p); else selectedPaths.add(p); document.getElementById('batchCount').textContent = selectedPaths.size; document.getElementById('batchBar').classList.toggle('hidden', !selectedPaths.size); }
+async function batchDelete() { if (!confirm('Hapus ' + selectedPaths.size + ' item?')) return; try { const r = await fetch('/api/batch-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths) }) }); const d = await r.json(); if (d.success) { selectedPaths.clear(); toggleSelectMode(); loadFiles(); toast(d.deleted + ' item dihapus'); } } catch {} }
+async function batchMove() { const dest = prompt('Path tujuan:'); if (!dest) return; try { const r = await fetch('/api/batch-move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths), destination: encode(dest) }) }); const d = await r.json(); if (d.success) { selectedPaths.clear(); toggleSelectMode(); loadFiles(); toast(d.moved + ' item dipindah'); } } catch {} }
+async function batchHash() { for (const p of selectedPaths) { try { await fetch('/api/recalc-hash', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: p }) }); } catch {} } toast('Hash dihitung!'); loadFiles(); }
+
+async function loadUsers() {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const res = await fetch('/api/users');
+        const d = await res.json();
+        if (!d.success) return;
+        let html = '';
+        d.users.forEach(u => { html += `<div class="flex items-center justify-between bg-dark-800/50 rounded-xl px-4 py-3 border border-dark-700/50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-dark-400"></i></div><div><p class="text-sm font-medium">${esc(u.username)}</p><p class="text-[10px] text-dark-500">${u.role === 'admin' ? 'Admin' : 'User'}</p></div></div>${u.username !== 'admin' ? `<button onclick="deleteUser(${u.id})" class="p-2 rounded-lg hover:bg-red-500/10 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>` : ''}</div>`; });
+        document.getElementById('usersList').innerHTML = html || '<p class="text-xs text-dark-500 text-center py-4">Belum ada user</p>';
+        lucide.createIcons();
+    } catch {}
+}
+async function createUser() {
+    const username = document.getElementById('newUsername').value.trim(), password = document.getElementById('newPassword').value.trim(), role = document.getElementById('newRole').value;
+    if (!username || !password) return toast('Username dan password wajib');
+    try {
+        const res = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, role }) });
+        const d = await res.json();
+        if (d.success) { document.getElementById('newUsername').value = ''; document.getElementById('newPassword').value = ''; loadUsers(); toast('User ditambahkan!'); } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+async function deleteUser(id) { if (!confirm('Hapus user ini?')) return; try { const r = await fetch('/api/users/' + id, { method: 'DELETE' }); const d = await r.json(); if (d.success) { loadUsers(); toast('User dihapus'); } } catch {} }
+
+async function loadShares() {
+    try {
+        const res = await fetch('/api/shares');
+        const d = await res.json();
+        document.getElementById('statShares').textContent = d.shares.length;
+        if (!d.shares.length) { document.getElementById('sharesList').innerHTML = '<p class="text-xs text-dark-500 text-center py-6">Belum ada share link</p>'; return; }
+        let html = '';
+        d.shares.forEach(s => { html += `<div class="bg-dark-800/50 rounded-xl p-3 border border-dark-700/50"><div class="text-xs font-medium truncate mb-1">${esc(s.path)}</div><div class="text-[10px] text-dark-500 mb-2">${esc(s.createdBy)} &bull; ${new Date(s.createdAt).toLocaleString('id-ID')}</div><div class="flex gap-2"><button onclick="navigator.clipboard.writeText('${s.url}').then(()=>toast('Disalin!'))" class="px-3 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-[11px] font-medium transition-colors">Copy</button><button onclick="deleteShare('${s.token}')" class="px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-[11px] font-medium text-red-400 transition-colors">Hapus</button></div></div>`; });
+        document.getElementById('sharesList').innerHTML = html;
+    } catch {}
+}
+async function deleteShare(token) { try { await fetch('/api/share/' + token, { method: 'DELETE' }); loadShares(); toast('Share dihapus'); } catch {} }
+
+function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(doSearch, 300); }
+async function doSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (!q) return loadFiles();
+    try {
+        const res = await fetch('/api/search?q=' + encodeURIComponent(q));
+        const d = await res.json();
+        const container = document.getElementById('fileList');
+        if (!d.results.length) { container.innerHTML = '<div class="p-12 text-center text-dark-500"><i data-lucide="search-x" class="w-8 h-8 mx-auto mb-3 opacity-30"></i><p class="text-sm">Tidak ditemukan</p></div>'; lucide.createIcons(); return; }
+        let html = `<div class="px-4 py-2.5 text-[11px] text-dark-500 border-b border-dark-700/30">${d.results.length} hasil ditemukan</div>`;
+        d.results.forEach(item => {
+            html += `<div class="flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 border-b border-dark-700/30 cursor-pointer transition-colors" onclick="${item.isFolder ? `navigateTo('${item.encodedPath}')` : ''}">
+                <div class="w-9 h-9 rounded-lg bg-dark-800/80 flex items-center justify-center shrink-0"><i data-lucide="${getFileIcon(item.name, item.isFolder)}" class="w-4 h-4 ${getFileColor(item.name, item.isFolder)}"></i></div>
+                <div class="min-w-0"><p class="text-sm font-medium truncate">${esc(item.name)}</p><p class="text-[11px] text-dark-500 font-mono">${esc(item.relPath)}</p></div>
+            </div>`;
+        });
+        container.innerHTML = html;
+        lucide.createIcons();
+    } catch {}
+}
+function setSort(s) { sort = s; closeModal('sortModal'); loadFiles(); }
+
+async function submitChangePassword() {
+    const currentPassword = document.getElementById('changeCurrentPass').value;
+    const newPassword = document.getElementById('changeNewPass').value;
+    const newUsername = document.getElementById('changeUsername').value.trim();
+    if (!currentPassword || !newPassword) return toast('Password lama dan baru wajib diisi');
+    try {
+        const res = await fetch('/api/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword, newPassword, newUsername }) });
+        const d = await res.json();
+        if (d.success) {
+            closeModal('changePassModal');
+            document.getElementById('changeCurrentPass').value = '';
+            document.getElementById('changeNewPass').value = '';
+            document.getElementById('changeUsername').value = '';
+            if (newUsername) document.getElementById('currentUser').textContent = newUsername;
+            toast('Berhasil diganti!');
+        } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+
+function batchCompress() {
+    const imageExts = /\.(jpg|jpeg|png|webp)$/i;
+    let count = 0;
+    for (const p of selectedPaths) {
+        try { const name = decode(p).split('/').pop(); if (imageExts.test(name)) count++; } catch {}
+    }
+    if (!count) return toast('Tidak ada gambar yang bisa dikompres');
+    document.getElementById('batchCompressCount').textContent = count + ' gambar';
+    openModal('batchCompressModal');
+}
+
+async function submitBatchCompress() {
+    const imageExts = /\.(jpg|jpeg|png|webp)$/i;
+    const imagePaths = [];
+    for (const p of selectedPaths) {
+        try { const name = decode(p).split('/').pop(); if (imageExts.test(name)) imagePaths.push(p); } catch {}
+    }
+    if (!imagePaths.length) return toast('Tidak ada gambar');
+    closeModal('batchCompressModal');
+    toast('Mengompres ' + imagePaths.length + ' gambar...');
+    try {
+        const res = await fetch('/api/batch-compress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: imagePaths, quality: parseInt(document.getElementById('batchCompressQuality').value) || 75 }) });
+        const d = await res.json();
+        if (d.success) { toast('Selesai! Hemat ' + d.savedFormatted + ' (' + d.compressed + ' file)'); loadFiles(); } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+
+async function sendTelegramReport() {
+    toast('Mengirim laporan...');
+    try {
+        const res = await fetch('/api/telegram-report', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const d = await res.json();
+        if (d.success) toast('Laporan terkirim ke Telegram!'); else toast(d.message || 'Gagal mengirim');
+    } catch (e) { toast(e.message); }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePreview(); document.querySelectorAll('.fixed:not(#toast):not(#previewOverlay)').forEach(el => { if (!el.classList.contains('hidden') && el.classList.contains('backdrop-blur-sm')) el.classList.add('hidden'); }); } });
+document.addEventListener('DOMContentLoaded', () => { init(); loadShares(); setInterval(() => { if (!document.getElementById('searchInput').value.trim()) loadFiles(); loadShares(); }, 30000); });
+</script>
+</body>
+</html>
