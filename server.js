@@ -676,6 +676,35 @@ app.delete('/api/users/:id', authRequired, adminRequired, (req, res) => {
     } catch (e) { res.status(400).json({ success: false, message: e.message }); }
 });
 
+app.post('/api/users/:id', authRequired, adminRequired, (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const { username, password, role } = req.body;
+        const users = getUsers();
+        const idx = users.findIndex(u => u.id === id);
+        if (idx === -1) throw new Error('User tidak ditemukan');
+        const user = users[idx];
+        if (username !== undefined && username !== null && username !== '') {
+            const newUsername = String(username).trim();
+            if (!newUsername) throw new Error('Username tidak boleh kosong');
+            if (newUsername !== user.username) {
+                if (findUser(newUsername)) throw new Error('Username sudah digunakan');
+                user.username = newUsername;
+            }
+        }
+        if (password !== undefined && password !== null && password !== '') {
+            user.password = bcrypt.hashSync(String(password), 10);
+        }
+        if (role && ['admin', 'user'].includes(role)) user.role = role;
+        saveUsers(users);
+        if (req.session.user.id === id) {
+            req.session.user.username = user.username;
+            req.session.user.role = user.role;
+        }
+        res.json({ success: true, user: { id: user.id, username: user.username, role: user.role } });
+    } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
 app.post('/api/recalc-hash', authRequired, async (req, res) => {
     try {
         const { path: p } = req.body;

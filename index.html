@@ -4,166 +4,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KangManis</title>
+    <script>if (localStorage.getItem('theme') === 'light') document.documentElement.className = 'light';</script>
     <script src="assets/tailwind.js"></script>
     <script src="assets/lucide.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { dark: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617' }}}}
+            theme: {
+                extend: {
+                    colors: {
+                        bg: 'rgb(var(--c-bg) / <alpha-value>)',
+                        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+                        raised: 'rgb(var(--c-raised) / <alpha-value>)',
+                        border: 'rgb(var(--c-border) / <alpha-value>)',
+                        text: 'rgb(var(--c-text) / <alpha-value>)',
+                        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+                        faint: 'rgb(var(--c-faint) / <alpha-value>)',
+                        accent: 'rgb(var(--c-accent) / <alpha-value>)',
+                        ok: 'rgb(var(--c-ok) / <alpha-value>)',
+                        danger: 'rgb(var(--c-danger) / <alpha-value>)',
+                        warn: 'rgb(var(--c-warn) / <alpha-value>)'
+                    },
+                    fontFamily: {
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
         }
     </script>
     <style>
-        .glass{background:rgba(30,41,59,.6);backdrop-filter:blur(12px);border:1px solid rgba(51,65,85,.4)}
-        .scrollbar::-webkit-scrollbar{width:4px}
-        .scrollbar::-webkit-scrollbar-track{background:transparent}
-        .scrollbar::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
-        .drop-active{border-color:#3b82f6!important;background:rgba(59,130,246,.05)!important}
-        .drop-hover{border-color:#3b82f6!important;background:rgba(59,130,246,.1)!important}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .anim-in{animation:fadeUp .25s ease-out}
-        @keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
-        .slide-up{animation:slideUp .3s ease-out}
+        :root {
+            --c-bg: 248 250 252;
+            --c-surface: 255 255 255;
+            --c-raised: 241 245 249;
+            --c-border: 226 232 240;
+            --c-text: 15 23 42;
+            --c-muted: 71 85 105;
+            --c-faint: 148 163 184;
+            --c-accent: 79 70 229;
+            --c-ok: 5 150 105;
+            --c-danger: 220 38 38;
+            --c-warn: 217 119 6;
+        }
+        .dark {
+            --c-bg: 2 6 23;
+            --c-surface: 15 23 42;
+            --c-raised: 30 41 59;
+            --c-border: 51 65 85;
+            --c-text: 226 232 240;
+            --c-muted: 148 163 184;
+            --c-faint: 100 116 139;
+            --c-accent: 99 102 241;
+            --c-ok: 52 211 153;
+            --c-danger: 248 113 113;
+            --c-warn: 251 191 36;
+        }
+        html:not(.dark) { color-scheme: light; }
+        html.dark { color-scheme: dark; }
 
-        html.light body{background:#f1f5f9;color:#1e293b}
-        html.light .glass{background:rgba(255,255,255,.75);border-color:rgba(226,232,240,.8)}
-        html.light .scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1}
+        .scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar::-webkit-scrollbar-thumb { background: rgb(var(--c-border)); border-radius: 99px; }
+        .scrollbar::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-faint)); }
+        .drop-active { border-color: rgb(var(--c-accent)) !important; background: rgb(var(--c-accent) / 0.05) !important; }
+        .drop-hover { border-color: rgb(var(--c-accent)) !important; background: rgb(var(--c-accent) / 0.1) !important; }
 
-        html.light .bg-dark-950{background-color:#f1f5f9}
-        html.light .bg-dark-900{background-color:#e2e8f0}
-        html.light .bg-dark-900\/80{background-color:rgba(226,232,240,.8)}
-        html.light .bg-dark-900\/50{background-color:rgba(226,232,240,.5)}
-        html.light .bg-dark-800{background-color:#e2e8f0}
-        html.light .bg-dark-800\/50{background-color:rgba(226,232,240,.5)}
-        html.light .bg-dark-800\/80{background-color:rgba(226,232,240,.8)}
-        html.light .bg-dark-700{background-color:#cbd5e1}
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .anim-in { animation: fadeUp .22s ease-out both; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .anim-fade { animation: fadeIn .16s ease-out both; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-up { animation: slideUp .28s ease-out both; }
 
-        html.light .text-white{color:#1e293b}
-        html.light .text-dark-300{color:#475569}
-        html.light .text-dark-400{color:#64748b}
-        html.light .text-dark-500{color:#94a3b8}
-        html.light .text-dark-600{color:#cbd5e1}
-
-        html.light .border-dark-700{border-color:#e2e8f0}
-        html.light .border-dark-700\/50{border-color:rgba(226,232,240,.5)}
-        html.light .border-dark-700\/30{border-color:rgba(226,232,240,.3)}
-
-        html.light .hover\:bg-dark-800:hover{background-color:#e2e8f0}
-        html.light .hover\:bg-dark-800\/50:hover{background-color:rgba(226,232,240,.5)}
-        html.light .hover\:bg-dark-700:hover{background-color:#cbd5e1}
-        html.light .hover\:bg-red-500\/10:hover{background-color:rgba(239,68,68,.08)}
-
-        html.light .placeholder-dark-500::placeholder{color:#94a3b8}
-        html.light .placeholder-dark-400::placeholder{color:#94a3b8}
-        html.light [class*="placeholder-"][class*="slate"]::placeholder{color:#94a3b8}
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
     </style>
 </head>
-<body class="min-h-screen bg-dark-950 text-white font-sans antialiased flex flex-col">
+<body class="min-h-screen bg-bg text-text font-sans antialiased flex flex-col">
 
 <!-- Toast -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden">
-    <div class="glass rounded-xl px-5 py-3 flex items-center gap-3 shadow-2xl slide-up">
-        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400" id="toastIcon"></i>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden" role="status" aria-live="polite">
+    <div class="bg-surface border border-border rounded-xl px-5 py-3 flex items-center gap-3 shadow-2xl slide-up">
+        <i data-lucide="check-circle" class="w-5 h-5 text-ok shrink-0" id="toastIcon"></i>
         <span class="text-sm font-medium" id="toastText"></span>
     </div>
 </div>
 
 <!-- Header -->
-<header class="sticky top-0 z-40 glass border-b border-dark-700/50">
-    <div class="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i data-lucide="hard-drive" class="w-5 h-5"></i>
+<header class="sticky top-0 z-40 bg-surface/85 backdrop-blur-md border-b border-border">
+    <div class="max-w-[1400px] mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <button onclick="toggleSidebar()" aria-label="Buka menu" class="lg:hidden w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center shadow-sm shrink-0">
+                <i data-lucide="hard-drive" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
             </div>
-            <div>
-                <h1 class="text-sm font-bold tracking-tight">KangManis</h1>
-                <p class="text-[10px] text-dark-400">Masuk sebagai <span class="text-blue-400 font-semibold" id="currentUser">-</span>
-                    <span id="roleBadge" class="hidden ml-1 text-[9px] bg-blue-500/15 text-blue-400 px-1.5 py-0.5 rounded font-bold">ADMIN</span>
+            <div class="min-w-0">
+                <h1 class="text-sm font-bold tracking-tight leading-tight">KangManis</h1>
+                <p class="text-[10px] text-muted truncate">Masuk sebagai <span class="text-accent font-semibold" id="currentUser">-</span>
+                    <span id="roleBadge" class="hidden ml-1 text-[9px] bg-accent/15 text-accent px-1.5 py-0.5 rounded-full font-bold">ADMIN</span>
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <button onclick="openModal('sharesModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Share Links">
-                <i data-lucide="link" class="w-4 h-4 text-dark-400"></i>
+
+        <div class="flex items-center gap-1 sm:gap-1.5">
+            <!-- Desktop actions -->
+            <button onclick="openModal('sharesModal')" class="hidden lg:inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors" title="Share Links" aria-label="Share Links">
+                <i data-lucide="link" class="w-4 h-4"></i>
             </button>
-            <button id="adminBtn" onclick="openModal('usersModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors hidden" title="Kelola User">
-                <i data-lucide="users" class="w-4 h-4 text-dark-400"></i>
+            <button id="adminBtn" onclick="openModal('usersModal')" class="hidden inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors" title="Kelola User" aria-label="Kelola User">
+                <i data-lucide="users" class="w-4 h-4"></i>
             </button>
-            <button onclick="sendTelegramReport()" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Kirim Laporan ke Telegram">
-                <i data-lucide="send" class="w-4 h-4 text-dark-400"></i>
+            <button onclick="sendTelegramReport()" class="hidden lg:inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors" title="Kirim Laporan ke Telegram" aria-label="Kirim laporan ke Telegram">
+                <i data-lucide="send" class="w-4 h-4"></i>
             </button>
-            <button onclick="openModal('changePassModal')" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Ganti Password">
-                <i data-lucide="key" class="w-4 h-4 text-dark-400"></i>
+            <button onclick="openModal('changePassModal')" class="hidden lg:inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors" title="Ganti Username & Password" aria-label="Ganti Username dan Password">
+                <i data-lucide="key" class="w-4 h-4"></i>
             </button>
-            <button onclick="toggleTheme()" class="p-2 rounded-xl border border-dark-700 hover:bg-dark-800 transition-colors" title="Toggle Theme">
-                <i data-lucide="sun" class="w-4 h-4 text-dark-400 hidden" id="iconSun"></i>
-                <i data-lucide="moon" class="w-4 h-4 text-dark-400" id="iconMoon"></i>
+
+            <!-- Theme -->
+            <button onclick="toggleTheme()" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors" title="Ganti tema" aria-label="Ganti tema">
+                <i data-lucide="sun" class="w-4 h-4 hidden" id="iconSun"></i>
+                <i data-lucide="moon" class="w-4 h-4" id="iconMoon"></i>
             </button>
-            <a href="/logout" class="p-2 rounded-xl border border-dark-700 hover:bg-red-500/10 hover:border-red-500/30 transition-colors" title="Keluar">
-                <i data-lucide="log-out" class="w-4 h-4 text-dark-400 hover:text-red-400"></i>
+            <!-- Logout (desktop) -->
+            <a href="/logout" class="hidden lg:inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border text-muted hover:bg-danger/10 hover:text-danger hover:border-danger/30 transition-colors" title="Keluar" aria-label="Keluar">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
             </a>
+
+            <!-- Mobile menu -->
+            <div class="relative lg:hidden" id="headerMenuWrap">
+                <button id="headerMenuBtn" onclick="toggleHeaderMenu()" aria-label="Menu lainnya" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-border text-muted hover:bg-raised hover:text-text transition-colors">
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </button>
+                <div id="headerMenu" class="hidden absolute right-0 top-full mt-2 w-56 bg-surface border border-border rounded-xl shadow-2xl p-1 z-[90] anim-in">
+                    <button onclick="closeHeaderMenu();openModal('sharesModal')" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg hover:bg-raised transition-colors">
+                        <i data-lucide="link" class="w-4 h-4 text-accent"></i> Share Links
+                    </button>
+                    <button id="adminMenuBtn" onclick="closeHeaderMenu();openModal('usersModal')" class="hidden w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg hover:bg-raised transition-colors">
+                        <i data-lucide="users" class="w-4 h-4 text-accent"></i> Kelola User
+                    </button>
+                    <button onclick="closeHeaderMenu();sendTelegramReport()" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg hover:bg-raised transition-colors">
+                        <i data-lucide="send" class="w-4 h-4 text-ok"></i> Laporan Telegram
+                    </button>
+                    <button onclick="closeHeaderMenu();openModal('changePassModal')" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg hover:bg-raised transition-colors">
+                        <i data-lucide="key" class="w-4 h-4 text-warn"></i> Ganti Username & Password
+                    </button>
+                    <div class="h-px bg-border my-1"></div>
+                    <a href="/logout" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg hover:bg-danger/10 text-danger transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </header>
 
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebarOverlay" class="fixed inset-0 z-[50] bg-black/50 backdrop-blur-sm hidden lg:hidden anim-fade" onclick="toggleSidebar(false)"></div>
+
 <!-- Main -->
-<main class="max-w-[1400px] w-full mx-auto p-4 flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
+<main class="max-w-[1400px] w-full mx-auto p-3 sm:p-4 flex-1 lg:grid lg:grid-cols-[290px_minmax(0,1fr)] lg:gap-4 lg:items-start">
 
     <!-- Sidebar -->
-    <aside class="space-y-4">
-        <!-- Storage -->
-        <div class="glass rounded-2xl p-5 anim-in">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-[11px] font-bold text-dark-400 uppercase tracking-wider">Kapasitas</h2>
-                <span class="text-[11px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full" id="storagePercent">0%</span>
+    <aside id="sidebar" class="fixed lg:relative inset-y-0 left-0 z-[55] w-[290px] max-w-[85vw] -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-out bg-bg lg:bg-transparent p-4 flex flex-col gap-4 overflow-y-auto scrollbar">
+        <!-- Drawer header (mobile) -->
+        <div class="flex items-center justify-between lg:hidden mb-1">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center"><i data-lucide="hard-drive" class="w-4 h-4 text-accent"></i></div>
+                <span class="font-semibold text-sm">Menu</span>
             </div>
-            <div class="w-full bg-dark-900 rounded-full h-2 mb-3">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500" id="storageBar" style="width:0%"></div>
+            <button onclick="toggleSidebar(false)" aria-label="Tutup menu" class="w-9 h-9 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Storage -->
+        <div class="bg-surface border border-border rounded-2xl p-4 sm:p-5 anim-in">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-[11px] font-semibold text-muted uppercase tracking-wider">Kapasitas</h2>
+                <span class="text-[11px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full" id="storagePercent">0%</span>
+            </div>
+            <div class="w-full bg-raised rounded-full h-2 mb-3">
+                <div class="bg-gradient-to-r from-accent to-accent/60 h-full rounded-full transition-all duration-500" id="storageBar" style="width:0%"></div>
             </div>
             <div class="grid grid-cols-2 gap-2 text-center">
-                <div class="bg-dark-900/50 rounded-xl py-2.5 px-2 border border-dark-700/50">
-                    <div class="text-[10px] text-dark-500 mb-0.5">Terpakai</div>
-                    <div class="text-sm font-bold" id="storageUsed">-</div>
+                <div class="bg-raised/70 rounded-xl py-2.5 px-2">
+                    <div class="text-[10px] text-faint mb-0.5">Terpakai</div>
+                    <div class="text-sm font-semibold" id="storageUsed">-</div>
                 </div>
-                <div class="bg-dark-900/50 rounded-xl py-2.5 px-2 border border-dark-700/50">
-                    <div class="text-[10px] text-dark-500 mb-0.5">Sisa</div>
-                    <div class="text-sm font-bold text-emerald-400" id="storageAvail">-</div>
+                <div class="bg-raised/70 rounded-xl py-2.5 px-2">
+                    <div class="text-[10px] text-faint mb-0.5">Sisa</div>
+                    <div class="text-sm font-semibold text-ok" id="storageAvail">-</div>
                 </div>
             </div>
         </div>
 
         <!-- Stats -->
-        <div class="glass rounded-2xl p-5 anim-in" style="animation-delay:.05s">
-            <h2 class="text-[11px] font-bold text-dark-400 uppercase tracking-wider mb-3">Statistik</h2>
+        <div class="bg-surface border border-border rounded-2xl p-4 sm:p-5 anim-in" style="animation-delay:.05s">
+            <h2 class="text-[11px] font-semibold text-muted uppercase tracking-wider mb-3">Statistik</h2>
             <div class="space-y-2.5">
                 <div class="flex items-center justify-between text-sm">
-                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="folder" class="w-4 h-4 text-amber-400"></i> Folder</span>
-                    <strong id="statFolders" class="font-bold">0</strong>
+                    <span class="flex items-center gap-2 text-muted"><i data-lucide="folder" class="w-4 h-4 text-warn"></i> Folder</span>
+                    <strong id="statFolders" class="font-semibold">0</strong>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="file" class="w-4 h-4 text-blue-400"></i> File</span>
-                    <strong id="statFiles" class="font-bold">0</strong>
+                    <span class="flex items-center gap-2 text-muted"><i data-lucide="file" class="w-4 h-4 text-ok"></i> File</span>
+                    <strong id="statFiles" class="font-semibold">0</strong>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="database" class="w-4 h-4 text-purple-400"></i> Total</span>
-                    <strong id="statTotal" class="font-bold">0 B</strong>
+                    <span class="flex items-center gap-2 text-muted"><i data-lucide="database" class="w-4 h-4 text-accent"></i> Total</span>
+                    <strong id="statTotal" class="font-semibold">0 B</strong>
                 </div>
-                <div class="flex items-center justify-between text-sm pt-2 border-t border-dark-700/50">
-                    <span class="flex items-center gap-2 text-dark-400"><i data-lucide="link" class="w-4 h-4 text-cyan-400"></i> Shares</span>
-                    <strong id="statShares" class="font-bold">0</strong>
+                <div class="flex items-center justify-between text-sm pt-2 border-t border-border">
+                    <span class="flex items-center gap-2 text-muted"><i data-lucide="link" class="w-4 h-4 text-accent"></i> Shares</span>
+                    <strong id="statShares" class="font-semibold">0</strong>
                 </div>
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="glass rounded-2xl p-5 space-y-2.5 anim-in" style="animation-delay:.1s">
-            <button onclick="triggerUpload()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 active:scale-[.98]">
+        <div class="bg-surface border border-border rounded-2xl p-4 sm:p-5 space-y-2.5 anim-in" style="animation-delay:.1s">
+            <button onclick="triggerUpload()" class="w-full inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent/90 text-white font-medium py-2.5 rounded-xl text-sm transition-all active:scale-[.98] shadow-sm">
                 <i data-lucide="cloud-upload" class="w-4 h-4"></i> Unggah File
             </button>
-            <button onclick="triggerFolderUpload()" class="w-full border border-dark-700 hover:bg-dark-800 font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
-                <i data-lucide="folder-input" class="w-4 h-4 text-dark-400"></i> Unggah Folder
+            <button onclick="triggerFolderUpload()" class="w-full inline-flex items-center justify-center gap-2 border border-border hover:bg-raised hover:text-text font-medium py-2.5 rounded-xl text-sm transition-colors text-muted">
+                <i data-lucide="folder-input" class="w-4 h-4 text-accent"></i> Unggah Folder
             </button>
-            <button onclick="openModal('mkdirModal')" class="w-full border border-dark-700 hover:bg-dark-800 font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
-                <i data-lucide="folder-plus" class="w-4 h-4 text-dark-400"></i> Folder Baru
+            <button onclick="openModal('mkdirModal')" class="w-full inline-flex items-center justify-center gap-2 border border-border hover:bg-raised hover:text-text font-medium py-2.5 rounded-xl text-sm transition-colors text-muted">
+                <i data-lucide="folder-plus" class="w-4 h-4 text-accent"></i> Folder Baru
             </button>
             <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect()">
             <input type="file" id="folderInput" webkitdirectory multiple style="display:none" onchange="handleFileSelect()">
@@ -171,58 +240,62 @@
     </aside>
 
     <!-- Explorer -->
-    <section class="flex flex-col gap-4 min-h-0">
+    <section class="flex flex-col gap-4 min-w-0 mt-4 lg:mt-0">
         <!-- Search + Toolbar -->
-        <div class="glass rounded-2xl p-4 anim-in" style="animation-delay:.05s">
+        <div class="bg-surface border border-border rounded-2xl p-3 sm:p-4 anim-in" style="animation-delay:.05s">
             <div class="relative mb-3">
-                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500"></i>
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-faint pointer-events-none"></i>
                 <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="Cari file atau folder..."
-                    class="w-full bg-dark-900/80 border border-dark-700 rounded-xl pl-11 pr-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors">
+                    class="w-full bg-bg border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors">
             </div>
             <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-1 text-xs overflow-x-auto scrollbar py-1 flex-1 min-w-0">
-                    <i data-lucide="folder-open" class="w-4 h-4 text-blue-400 shrink-0"></i>
-                    <div class="flex items-center gap-0.5 font-mono" id="breadcrumb"></div>
+                <div class="flex items-center gap-1 text-xs overflow-x-auto scrollbar py-1 flex-1 min-w-0" aria-label="Lokasi saat ini">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-accent shrink-0"></i>
+                    <div class="flex items-center gap-0.5 font-mono whitespace-nowrap" id="breadcrumb"></div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
-                    <button id="selectModeBtn" onclick="toggleSelectMode()" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Pilih Banyak">
-                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-dark-400"></i>
+                    <button id="selectModeBtn" onclick="toggleSelectMode()" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-border text-muted hover:bg-raised transition-colors" title="Pilih Banyak" aria-label="Pilih banyak">
+                        <i data-lucide="check-square" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="openModal('sortModal')" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Urutkan">
-                        <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-dark-400"></i>
+                    <button onclick="openModal('sortModal')" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-border text-muted hover:bg-raised transition-colors" title="Urutkan" aria-label="Urutkan">
+                        <i data-lucide="arrow-up-down" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="loadFiles()" class="p-2 rounded-lg border border-dark-700 hover:bg-dark-800 transition-colors" title="Refresh">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-dark-400"></i>
+                    <button onclick="loadFiles()" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-border text-muted hover:bg-raised transition-colors" title="Refresh" aria-label="Refresh">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
+                    <div class="flex items-center gap-0.5 p-0.5 rounded-lg border border-border" role="group" aria-label="Tampilan">
+                        <button id="viewListBtn" onclick="setView('list')" class="w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors" title="Tampilan daftar" aria-label="Tampilan daftar"><i data-lucide="list" class="w-4 h-4"></i></button>
+                        <button id="viewGridBtn" onclick="setView('grid')" class="w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors" title="Tampilan grid" aria-label="Tampilan grid"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Drop Zone -->
-        <div id="dropZone" class="hidden border-2 border-dashed border-dark-700 rounded-2xl p-10 text-center transition-all">
-            <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-blue-500/50 mb-3"></i>
-            <p class="text-sm text-dark-400">Seret & lepas file di sini</p>
+        <div id="dropZone" class="hidden border-2 border-dashed border-faint/60 rounded-2xl p-10 text-center transition-all">
+            <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-accent/50 mb-3"></i>
+            <p class="text-sm text-muted">Seret &amp; lepas file di sini</p>
         </div>
 
         <!-- Progress -->
-        <div id="progressArea" class="hidden glass rounded-2xl p-4">
+        <div id="progressArea" class="hidden bg-surface border border-border rounded-2xl p-4">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-medium flex items-center gap-2">
-                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-400"></i>
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-accent"></i>
                     <span id="progressText">Mengunggah...</span>
                 </span>
-                <span class="text-sm font-bold text-blue-400" id="progressPercent">0%</span>
+                <span class="text-sm font-bold text-accent" id="progressPercent">0%</span>
             </div>
-            <div class="w-full bg-dark-900 rounded-full h-1.5 mb-2">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all" id="progressBar" style="width:0%"></div>
+            <div class="w-full bg-raised rounded-full h-1.5 mb-2">
+                <div class="bg-gradient-to-r from-accent to-accent/60 h-full rounded-full transition-all" id="progressBar" style="width:0%"></div>
             </div>
-            <p class="text-[11px] text-dark-500" id="progressDetail"></p>
+            <p class="text-[11px] text-faint" id="progressDetail"></p>
         </div>
 
         <!-- File List -->
-        <div class="glass rounded-2xl border border-dark-700/50 overflow-hidden flex-1 flex flex-col min-h-[400px]">
+        <div class="bg-surface border border-border rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[380px]">
             <div class="flex-1 overflow-y-auto scrollbar" id="fileList">
-                <div class="p-12 text-center text-dark-500">
+                <div class="p-14 text-center text-muted">
                     <i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-3 animate-spin"></i>
                     <p class="text-sm">Memuat...</p>
                 </div>
@@ -231,24 +304,27 @@
     </section>
 </main>
 
+<!-- Row menu (popover) -->
+<div id="rowMenu" class="hidden fixed z-[80] min-w-[190px] max-w-[220px] bg-surface border border-border rounded-xl shadow-2xl p-1 anim-in"></div>
+
 <!-- Batch Bar -->
-<div id="batchBar" class="fixed bottom-0 left-0 right-0 z-50 hidden slide-up">
-    <div class="glass border-t border-dark-700/50 px-6 py-3">
-        <div class="max-w-[1400px] mx-auto flex items-center justify-center gap-4">
-            <span class="text-sm font-medium"><strong id="batchCount" class="text-blue-400">0</strong> dipilih</span>
-            <button onclick="batchMove()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+<div id="batchBar" class="fixed bottom-0 left-0 right-0 z-[60] hidden slide-up">
+    <div class="bg-surface border-t border-border px-4 py-3" style="padding-bottom:max(.75rem,env(safe-area-inset-bottom))">
+        <div class="max-w-[1400px] mx-auto flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-medium mr-auto"><strong id="batchCount" class="text-accent">0</strong> dipilih</span>
+            <button onclick="batchMove()" class="px-3.5 py-2 rounded-lg bg-accent hover:bg-accent/90 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
                 <i data-lucide="move" class="w-3.5 h-3.5"></i> Pindah
             </button>
-            <button onclick="batchDelete()" class="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+            <button onclick="batchDelete()" class="px-3.5 py-2 rounded-lg bg-danger/85 hover:bg-danger text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
             </button>
-            <button onclick="batchHash()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Hash
+            <button onclick="batchHash()" class="px-3.5 py-2 rounded-lg border border-border hover:bg-raised text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-ok"></i> Hash
             </button>
-            <button onclick="batchCompress()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                <i data-lucide="image" class="w-3.5 h-3.5 text-emerald-400"></i> Kompres
+            <button onclick="batchCompress()" class="px-3.5 py-2 rounded-lg border border-border hover:bg-raised text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i data-lucide="image" class="w-3.5 h-3.5 text-ok"></i> Kompres
             </button>
-            <button onclick="toggleSelectMode()" class="px-4 py-2 rounded-lg border border-dark-700 hover:bg-dark-800 text-xs font-semibold transition-colors">Batal</button>
+            <button onclick="toggleSelectMode()" class="px-3.5 py-2 rounded-lg border border-border hover:bg-raised text-xs font-semibold transition-colors">Batal</button>
         </div>
     </div>
 </div>
@@ -256,233 +332,290 @@
 <!-- ==================== MODALS ==================== -->
 
 <!-- Upload Confirm -->
-<div id="uploadConfirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('uploadConfirmModal')">
-    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
+<div id="uploadConfirmModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('uploadConfirmModal')">
+    <div class="w-full sm:max-w-md bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in max-h-[90vh] overflow-y-auto scrollbar">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="cloud-upload" class="w-5 h-5 text-blue-400"></i></div>
-            <div><h3 class="font-bold text-sm">Konfirmasi Upload</h3><p class="text-xs text-dark-400" id="uploadCountText">0 file</p></div>
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="cloud-upload" class="w-5 h-5 text-accent"></i></div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base">Konfirmasi Upload</h3>
+                <p class="text-xs text-muted" id="uploadCountText">0 file</p>
+            </div>
+            <button onclick="closeModal('uploadConfirmModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <label class="flex items-center gap-2.5 mb-3 cursor-pointer">
-            <input type="checkbox" id="compressCheck" class="w-4 h-4 rounded accent-blue-500">
-            <span class="text-xs text-dark-400">Kompres gambar saat upload</span>
+        <label class="flex items-center gap-2.5 mb-3 cursor-pointer select-none">
+            <input type="checkbox" id="compressCheck" class="w-4 h-4 rounded">
+            <span class="text-xs text-muted">Kompres gambar saat upload</span>
         </label>
-        <div class="max-h-48 overflow-y-auto scrollbar space-y-1 mb-5 text-xs text-dark-300" id="uploadFileList"></div>
+        <div class="max-h-48 overflow-y-auto scrollbar space-y-1 mb-5 text-xs text-muted bg-raised/60 rounded-xl p-2" id="uploadFileList"></div>
         <div class="flex gap-3">
-            <button onclick="closeModal('uploadConfirmModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="confirmUpload()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Upload</button>
+            <button onclick="closeModal('uploadConfirmModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="confirmUpload()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Upload</button>
         </div>
     </div>
 </div>
 
 <!-- Mkdir -->
-<div id="mkdirModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('mkdirModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><i data-lucide="folder-plus" class="w-5 h-5 text-amber-400"></i></div>
-            <h3 class="font-bold text-sm">Folder Baru</h3>
+<div id="mkdirModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('mkdirModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="folder-plus" class="w-5 h-5 text-accent"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Folder Baru</h3>
+            <button onclick="closeModal('mkdirModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <input type="text" id="folderNameInput" placeholder="Nama folder..." onkeydown="if(event.key==='Enter')submitMkdir()"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <div class="flex gap-3">
-            <button onclick="closeModal('mkdirModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitMkdir()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Buat</button>
+            <button onclick="closeModal('mkdirModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitMkdir()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Buat</button>
         </div>
     </div>
 </div>
 
 <!-- Rename -->
-<div id="renameModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('renameModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="pencil" class="w-5 h-5 text-blue-400"></i></div>
-            <h3 class="font-bold text-sm">Ubah Nama</h3>
+<div id="renameModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('renameModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="pencil" class="w-5 h-5 text-accent"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Ubah Nama</h3>
+            <button onclick="closeModal('renameModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <input type="text" id="newNameInput" onkeydown="if(event.key==='Enter')submitRename()"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <input type="hidden" id="renamePath">
         <div class="flex gap-3">
-            <button onclick="closeModal('renameModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitRename()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Terapkan</button>
+            <button onclick="closeModal('renameModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitRename()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Terapkan</button>
         </div>
     </div>
 </div>
 
 <!-- Delete -->
-<div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('deleteModal')">
-    <div class="glass rounded-2xl max-w-xs w-full p-6 text-center anim-in">
-        <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-7 h-7 text-red-400"></i></div>
-        <h3 class="font-bold text-sm mb-1">Hapus Permanen?</h3>
-        <p class="text-xs text-dark-400 mb-5">Item: <span id="deleteName" class="font-semibold text-red-400">-</span></p>
+<div id="deleteModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('deleteModal')">
+    <div class="w-full sm:max-w-xs bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in text-center">
+        <div class="w-14 h-14 rounded-full bg-danger/10 flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-7 h-7 text-danger"></i></div>
+        <h3 class="font-semibold text-sm sm:text-base mb-1">Hapus Permanen?</h3>
+        <p class="text-xs text-muted mb-5">Item: <span id="deleteName" class="font-semibold text-danger">-</span></p>
         <input type="hidden" id="deletePath">
         <div class="flex gap-3">
-            <button onclick="closeModal('deleteModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitDelete()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors">Hapus</button>
+            <button onclick="closeModal('deleteModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitDelete()" class="flex-1 py-2.5 rounded-xl bg-danger hover:bg-danger/90 text-white text-sm font-semibold transition-colors">Hapus</button>
         </div>
     </div>
 </div>
 
 <!-- Move/Copy -->
-<div id="moveModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('moveModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center"><i data-lucide="move" class="w-5 h-5 text-purple-400"></i></div>
-            <h3 class="font-bold text-sm">Pindah / Salin</h3>
+<div id="moveModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('moveModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="move" class="w-5 h-5 text-accent"></i></div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base">Pindah / Salin</h3>
+                <p class="text-xs text-muted">Path tujuan relatif, contoh: <code class="bg-raised rounded px-1">FolderBaru</code></p>
+            </div>
+            <button onclick="closeModal('moveModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <input type="text" id="moveTargetInput" placeholder="Path tujuan (contoh: FolderBaru)" onkeydown="if(event.key==='Enter')submitAction('move')"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <input type="hidden" id="moveSource">
         <div class="flex gap-3">
-            <button onclick="closeModal('moveModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitAction('copy')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin</button>
-            <button onclick="submitAction('move')" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Pindah</button>
+            <button onclick="closeModal('moveModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button id="moveCopyBtn" onclick="submitAction('copy')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors flex items-center justify-center gap-1.5"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin</button>
+            <button onclick="submitAction('move')" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Pindah</button>
         </div>
     </div>
 </div>
 
 <!-- Compress -->
-<div id="compressModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('compressModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center"><i data-lucide="image" class="w-5 h-5 text-emerald-400"></i></div>
-            <div><h3 class="font-bold text-sm">Kompres Gambar</h3><p class="text-xs text-dark-400" id="compressName">-</p></div>
+<div id="compressModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('compressModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-ok/10 flex items-center justify-center shrink-0"><i data-lucide="image" class="w-5 h-5 text-ok"></i></div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base">Kompres Gambar</h3>
+                <p class="text-xs text-muted truncate" id="compressName">-</p>
+            </div>
+            <button onclick="closeModal('compressModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <label class="block text-xs text-dark-500 mb-1.5">Kualitas (10-100)</label>
+        <label for="compressQuality" class="block text-xs text-muted mb-1.5">Kualitas (10-100)</label>
         <input type="number" id="compressQuality" value="75" min="10" max="100"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <input type="hidden" id="compressPath">
         <div class="flex gap-3">
-            <button onclick="closeModal('compressModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitCompress()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors">Kompres</button>
+            <button onclick="closeModal('compressModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitCompress()" class="flex-1 py-2.5 rounded-xl bg-ok hover:bg-ok/90 text-white text-sm font-semibold transition-colors">Kompres</button>
         </div>
     </div>
 </div>
 
 <!-- Share -->
-<div id="shareModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('shareModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center"><i data-lucide="link" class="w-5 h-5 text-cyan-400"></i></div>
-            <div><h3 class="font-bold text-sm">Share File</h3><p class="text-xs text-dark-400" id="shareName">-</p></div>
+<div id="shareModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('shareModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="link" class="w-5 h-5 text-accent"></i></div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base">Share File</h3>
+                <p class="text-xs text-muted truncate" id="shareName">-</p>
+            </div>
+            <button onclick="closeModal('shareModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <label class="block text-xs text-dark-500 mb-1.5">Berlaku selama (jam, 0 = selamanya)</label>
+        <label for="shareExpiry" class="block text-xs text-muted mb-1.5">Berlaku selama (jam, 0 = selamanya)</label>
         <input type="number" id="shareExpiry" value="24" min="0"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-3">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-3">
         <input type="hidden" id="sharePath">
-        <div id="shareResult" class="hidden bg-dark-900 border border-dark-700 rounded-xl px-4 py-3 text-xs font-mono text-blue-400 break-all mb-4 cursor-pointer hover:border-blue-500/50 transition-colors" onclick="copyShareLink()"></div>
+        <div id="shareResult" class="hidden bg-raised/70 border border-border rounded-xl px-4 py-3 text-xs font-mono text-accent break-all mb-4 cursor-pointer hover:border-accent/50 transition-colors" onclick="copyShareLink()" title="Klik untuk salin"></div>
         <div class="flex gap-3">
-            <button onclick="closeModal('shareModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
-            <button onclick="submitShare()" class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold transition-colors">Generate</button>
+            <button onclick="closeModal('shareModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Tutup</button>
+            <button onclick="submitShare()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Generate</button>
         </div>
     </div>
 </div>
 
 <!-- Info -->
-<div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('infoModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="info" class="w-5 h-5 text-blue-400"></i></div>
-            <h3 class="font-bold text-sm">Informasi File</h3>
+<div id="infoModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('infoModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="info" class="w-5 h-5 text-accent"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Informasi File</h3>
+            <button onclick="closeModal('infoModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <div id="infoContent" class="text-xs text-dark-300 max-h-64 overflow-y-auto scrollbar mb-5 space-y-2"></div>
-        <button onclick="closeModal('infoModal')" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Tutup</button>
+        <div id="infoContent" class="text-xs text-muted max-h-64 overflow-y-auto scrollbar mb-5 space-y-2"></div>
+        <button onclick="closeModal('infoModal')" class="w-full py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Tutup</button>
     </div>
 </div>
 
 <!-- Users -->
-<div id="usersModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('usersModal')">
-    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-blue-400"></i></div>
-            <h3 class="font-bold text-sm">Kelola User</h3>
+<div id="usersModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('usersModal')">
+    <div class="w-full sm:max-w-md bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in max-h-[90vh] overflow-y-auto scrollbar">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="users" class="w-5 h-5 text-accent"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Kelola User</h3>
+            <button onclick="closeModal('usersModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <div id="usersList" class="max-h-48 overflow-y-auto scrollbar space-y-2 mb-5"></div>
-        <div class="border-t border-dark-700/50 pt-4 space-y-3">
-            <input type="text" id="newUsername" placeholder="Username baru..." class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
-            <input type="password" id="newPassword" placeholder="Password..." class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
-            <select id="newRole" class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors">
+        <div class="border-t border-border pt-4 space-y-3">
+            <input type="text" id="newUsername" placeholder="Username baru..." class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors">
+            <input type="password" id="newPassword" placeholder="Password..." class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors">
+            <select id="newRole" class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors">
                 <option value="user">User</option><option value="admin">Admin</option>
             </select>
-            <button onclick="createUser()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">Tambah User</button>
+            <button onclick="createUser()" class="w-full bg-accent hover:bg-accent/90 text-white font-medium py-2.5 rounded-xl text-sm transition-colors">Tambah User</button>
         </div>
-        <button onclick="closeModal('usersModal')" class="w-full mt-3 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+        <button onclick="closeModal('usersModal')" class="w-full mt-3 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- Edit User -->
+<div id="editUserModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('editUserModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-warn/10 flex items-center justify-center shrink-0"><i data-lucide="key" class="w-5 h-5 text-warn"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Ganti Username &amp; Password</h3>
+            <button onclick="closeModal('editUserModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <input type="hidden" id="editUserId">
+        <input type="text" id="editUsername" placeholder="Username baru..." class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-3">
+        <input type="password" id="editPassword" placeholder="Password baru (kosongkan jika tidak ganti)" class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-3">
+        <select id="editRole" class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
+            <option value="user">User</option><option value="admin">Admin</option>
+        </select>
+        <div class="flex gap-3">
+            <button onclick="closeModal('editUserModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="saveUser()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Simpan</button>
+        </div>
     </div>
 </div>
 
 <!-- Shares List -->
-<div id="sharesModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('sharesModal')">
-    <div class="glass rounded-2xl max-w-md w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center"><i data-lucide="link" class="w-5 h-5 text-cyan-400"></i></div>
-            <h3 class="font-bold text-sm">Share Links Aktif</h3>
+<div id="sharesModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('sharesModal')">
+    <div class="w-full sm:max-w-md bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in max-h-[90vh] overflow-y-auto scrollbar">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="link" class="w-5 h-5 text-accent"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Share Links Aktif</h3>
+            <button onclick="closeModal('sharesModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <div id="sharesList" class="max-h-64 overflow-y-auto scrollbar space-y-2 mb-5"></div>
-        <button onclick="closeModal('sharesModal')" class="w-full py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+        <button onclick="closeModal('sharesModal')" class="w-full py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Tutup</button>
     </div>
 </div>
 
 <!-- Sort -->
-<div id="sortModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('sortModal')">
-    <div class="glass rounded-2xl max-w-xs w-full p-5 anim-in">
-        <h3 class="font-bold text-sm mb-4 flex items-center gap-2"><i data-lucide="arrow-up-down" class="w-4 h-4 text-blue-400"></i> Urutkan</h3>
+<div id="sortModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('sortModal')">
+    <div class="w-full sm:max-w-xs bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 anim-in">
+        <h3 class="font-semibold text-sm sm:text-base mb-4 flex items-center gap-2"><i data-lucide="arrow-up-down" class="w-4 h-4 text-accent"></i> Urutkan</h3>
         <div class="space-y-1.5" id="sortOptions">
-            <button onclick="setSort('name_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Nama A → Z</button>
-            <button onclick="setSort('name_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Nama Z → A</button>
-            <button onclick="setSort('size_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Ukuran kecil → besar</button>
-            <button onclick="setSort('size_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Ukuran besar → kecil</button>
-            <button onclick="setSort('date_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Terbaru</button>
-            <button onclick="setSort('date_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-dark-800 text-sm transition-colors">Terlama</button>
+            <button onclick="setSort('name_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Nama A &rarr; Z</button>
+            <button onclick="setSort('name_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Nama Z &rarr; A</button>
+            <button onclick="setSort('size_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Ukuran kecil &rarr; besar</button>
+            <button onclick="setSort('size_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Ukuran besar &rarr; kecil</button>
+            <button onclick="setSort('date_desc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Terbaru</button>
+            <button onclick="setSort('date_asc')" class="w-full text-left px-4 py-2.5 rounded-xl hover:bg-raised text-sm transition-colors">Terlama</button>
         </div>
-        <button onclick="closeModal('sortModal')" class="w-full mt-3 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Tutup</button>
+        <button onclick="closeModal('sortModal')" class="w-full mt-3 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Tutup</button>
     </div>
 </div>
 
 <!-- Change Password -->
-<div id="changePassModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('changePassModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><i data-lucide="key" class="w-5 h-5 text-amber-400"></i></div>
-            <h3 class="font-bold text-sm">Ganti Username & Password</h3>
+<div id="changePassModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('changePassModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-warn/10 flex items-center justify-center shrink-0"><i data-lucide="key" class="w-5 h-5 text-warn"></i></div>
+            <h3 class="font-semibold text-sm sm:text-base flex-1">Ganti Username &amp; Password</h3>
+            <button onclick="closeModal('changePassModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <input type="text" id="changeUsername" placeholder="Username baru (kosongkan jika tidak ganti)"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-3">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-3">
         <input type="password" id="changeCurrentPass" placeholder="Password saat ini"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-3">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-3">
         <input type="password" id="changeNewPass" placeholder="Password baru"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm placeholder-dark-500 focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <div class="flex gap-3">
-            <button onclick="closeModal('changePassModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitChangePassword()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">Simpan</button>
+            <button onclick="closeModal('changePassModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitChangePassword()" class="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors">Simpan</button>
         </div>
     </div>
 </div>
 
 <!-- Batch Compress Confirm -->
-<div id="batchCompressModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('batchCompressModal')">
-    <div class="glass rounded-2xl max-w-sm w-full p-6 anim-in">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center"><i data-lucide="image" class="w-5 h-5 text-emerald-400"></i></div>
-            <div><h3 class="font-bold text-sm">Kompres Batch</h3><p class="text-xs text-dark-400" id="batchCompressCount">0 gambar</p></div>
+<div id="batchCompressModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-end sm:items-center justify-center overflow-y-auto" onclick="if(event.target===this)closeModal('batchCompressModal')">
+    <div class="w-full sm:max-w-sm bg-surface border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 anim-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-ok/10 flex items-center justify-center shrink-0"><i data-lucide="image" class="w-5 h-5 text-ok"></i></div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-sm sm:text-base">Kompres Batch</h3>
+                <p class="text-xs text-muted" id="batchCompressCount">0 gambar</p>
+            </div>
+            <button onclick="closeModal('batchCompressModal')" aria-label="Tutup" class="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <label class="block text-xs text-dark-500 mb-1.5">Kualitas (10-100)</label>
+        <label for="batchCompressQuality" class="block text-xs text-muted mb-1.5">Kualitas (10-100)</label>
         <input type="number" id="batchCompressQuality" value="75" min="10" max="100"
-            class="w-full bg-dark-900 border border-dark-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors mb-4">
+            class="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors mb-4">
         <div class="flex gap-3">
-            <button onclick="closeModal('batchCompressModal')" class="flex-1 py-2.5 rounded-xl border border-dark-700 hover:bg-dark-800 text-sm font-semibold transition-colors">Batal</button>
-            <button onclick="submitBatchCompress()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors">Kompres</button>
+            <button onclick="closeModal('batchCompressModal')" class="flex-1 py-2.5 rounded-xl border border-border hover:bg-raised text-sm font-medium transition-colors">Batal</button>
+            <button onclick="submitBatchCompress()" class="flex-1 py-2.5 rounded-xl bg-ok hover:bg-ok/90 text-white text-sm font-semibold transition-colors">Kompres</button>
         </div>
     </div>
 </div>
 
 <!-- Preview -->
-<div id="previewOverlay" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4" onclick="closePreview()">
-    <button onclick="closePreview()" class="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
-    <img id="previewImg" src="" class="max-w-full max-h-[85vh] object-contain rounded-xl" onclick="event.stopPropagation()">
+<div id="previewOverlay" class="modal-overlay fixed inset-0 bg-black/95 z-[95] hidden flex flex-col items-center justify-center p-4 sm:p-6" onclick="closePreview()">
+    <button onclick="closePreview()" class="absolute top-4 right-4 z-10 w-10 h-10 inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" aria-label="Tutup preview">
+        <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <img id="previewImg" src="" alt="Pratinjau" class="max-w-full max-h-[78vh] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    <div class="mt-4 w-full max-w-lg flex items-center justify-center" onclick="event.stopPropagation()">
+        <span id="previewName" class="text-xs text-white/60 truncate text-center"></span>
+    </div>
+    <a id="previewDl" href="#" onclick="event.stopPropagation()" class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
+    </a>
 </div>
 
 <!-- ==================== SCRIPTS ==================== -->
 <script>
 let currentPath = '', pendingFiles = [], sort = 'name_asc', selectMode = false, selectedPaths = new Set();
 let currentUserData = null, searchTimer = null;
+let viewMode = localStorage.getItem('view') === 'grid' ? 'grid' : 'list';
+let lastItems = [], deleteBatchMode = false, moveBatchMode = false;
 
 async function init() {
     try {
@@ -493,6 +626,7 @@ async function init() {
         document.getElementById('currentUser').textContent = data.user.username;
         if (data.user.role === 'admin') {
             document.getElementById('adminBtn').classList.remove('hidden');
+            document.getElementById('adminMenuBtn').classList.remove('hidden');
             document.getElementById('roleBadge').classList.remove('hidden');
         }
     } catch { return window.location.href = '/login'; }
@@ -502,6 +636,7 @@ async function init() {
         document.getElementById('iconMoon').classList.add('hidden');
         document.getElementById('iconSun').classList.remove('hidden');
     }
+    setView(viewMode);
     loadFiles();
     setupDragDrop();
 }
@@ -516,6 +651,27 @@ function toggleTheme() {
 
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); lucide.createIcons(); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function toggleSidebar(force) {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebarOverlay');
+    const open = force !== undefined ? force : sb.classList.contains('-translate-x-full');
+    sb.classList.toggle('-translate-x-full', !open);
+    sb.classList.toggle('translate-x-0', open);
+    ov.classList.toggle('hidden', !open);
+}
+
+function toggleHeaderMenu() { document.getElementById('headerMenu').classList.toggle('hidden'); }
+function closeHeaderMenu() { document.getElementById('headerMenu').classList.add('hidden'); }
+
+function setView(m) {
+    viewMode = m;
+    localStorage.setItem('view', m);
+    const l = document.getElementById('viewListBtn'), g = document.getElementById('viewGridBtn');
+    l.classList.toggle('bg-raised', m === 'list'); l.classList.toggle('text-text', m === 'list'); l.classList.toggle('text-muted', m !== 'list');
+    g.classList.toggle('bg-raised', m === 'grid'); g.classList.toggle('text-text', m === 'grid'); g.classList.toggle('text-muted', m !== 'grid');
+    if (lastItems.length || currentPath) renderFiles();
+}
 
 function encode(p) {
     if (!p || p === '/') return '';
@@ -532,7 +688,8 @@ function toast(msg) {
     const el = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
     el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 2500);
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.add('hidden'), 2500);
 }
 
 function getFileIcon(name, isFolder) {
@@ -549,21 +706,22 @@ function getFileIcon(name, isFolder) {
     return map[ext] || 'file';
 }
 function getFileColor(name, isFolder) {
-    if (isFolder) return 'text-amber-400';
+    if (isFolder) return 'text-warn';
     const ext = name.split('.').pop().toLowerCase();
-    if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(ext)) return 'text-pink-400';
-    if (/\.(mp4|mkv|avi|mov)$/i.test(ext)) return 'text-red-400';
-    if (/\.(mp3|wav|flac|ogg)$/i.test(ext)) return 'text-purple-400';
-    if (/\.(zip|rar|7z|tar)$/i.test(ext)) return 'text-yellow-400';
-    if (/\.(js|ts|py|java|html|css)$/i.test(ext)) return 'text-green-400';
-    if (/\.(pdf)$/i.test(ext)) return 'text-red-400';
-    return 'text-blue-400';
+    if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(ext)) return 'text-pink-500 dark:text-pink-400';
+    if (/\.(mp4|mkv|avi|mov)$/i.test(ext)) return 'text-red-500 dark:text-red-400';
+    if (/\.(mp3|wav|flac|ogg)$/i.test(ext)) return 'text-purple-500 dark:text-purple-400';
+    if (/\.(zip|rar|7z|tar)$/i.test(ext)) return 'text-yellow-600 dark:text-yellow-400';
+    if (/\.(js|ts|py|java|html|css)$/i.test(ext)) return 'text-green-600 dark:text-green-400';
+    if (/\.(pdf)$/i.test(ext)) return 'text-red-500 dark:text-red-400';
+    return 'text-accent';
 }
 function isImage(name) { return /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(name); }
 
 async function loadFiles() {
     const container = document.getElementById('fileList');
-    container.innerHTML = '<div class="p-12 text-center text-dark-500"><i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-3 animate-spin"></i></div>';
+    container.innerHTML = '<div class="p-14 text-center text-muted"><i data-lucide="loader-2" class="w-8 h-8 mx-auto mb-3 animate-spin"></i></div>';
+    lucide.createIcons();
     try {
         const res = await fetch('/api/files?path=' + encodeURIComponent(encode(currentPath)));
         const data = await res.json();
@@ -592,59 +750,139 @@ async function loadFiles() {
             }
             return 0;
         });
-        let html = '';
-        if (currentPath) {
-            const parent = currentPath.split('/').slice(0, -1).join('/');
-            html += `<div class="flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 cursor-pointer border-b border-dark-700/30 transition-colors" onclick="navigateTo('${encode(parent)}')">
-                <div class="w-9 h-9 rounded-lg bg-dark-800 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-dark-400"></i></div>
-                <span class="text-sm font-medium text-dark-400">Kembali</span></div>`;
-        }
-        items.forEach(item => {
-            const checked = selectedPaths.has(item.path);
-            const icon = getFileIcon(item.name, item.isFolder);
-            const color = getFileColor(item.name, item.isFolder);
-            const actions = buildActions(item);
-            html += `<div class="file-row flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 border-b border-dark-700/30 transition-colors ${checked ? 'bg-blue-500/5' : ''}" onclick="${item.isFolder ? `navigateTo('${item.path}')` : (isImage(item.name) ? `openPreview('${item.path}')` : '')}">
-                ${selectMode ? `<input type="checkbox" ${checked ? 'checked' : ''} class="w-4 h-4 accent-blue-500 cursor-pointer shrink-0" onclick="event.stopPropagation();toggleSelect('${item.path}')">` : ''}
-                <div class="w-9 h-9 rounded-lg bg-dark-800/80 flex items-center justify-center shrink-0"><i data-lucide="${icon}" class="w-4 h-4 ${color}"></i></div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium truncate">${esc(item.name)}</p>
-                    <p class="text-[11px] text-dark-500">${item.sizeFormatted}${item.hash ? ' <span class="inline-flex items-center gap-0.5 text-emerald-500" title="Hash verified"><i data-lucide="shield-check" class="w-2.5 h-2.5"></i></span>' : ''}</p>
-                </div>
-                <div class="flex items-center gap-1 shrink-0">${actions}</div>
-            </div>`;
-        });
-        if (!items.length && !currentPath) html = '<div class="p-16 text-center text-dark-500"><i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Folder kosong</p><p class="text-xs text-dark-600 mt-1">Mulai upload file!</p></div>';
-        if (!items.length && currentPath) html = '<div class="p-12 text-center text-dark-500"><p class="text-sm">Folder kosong</p></div>';
-        container.innerHTML = html;
+        lastItems = items;
+        renderFiles();
         lucide.createIcons();
-    } catch (e) { container.innerHTML = `<div class="p-12 text-center text-red-400"><p class="text-sm">${esc(e.message)}</p></div>`; }
+    } catch (e) { container.innerHTML = `<div class="p-12 text-center text-danger"><p class="text-sm">${esc(e.message)}</p></div>`; lucide.createIcons(); }
 }
 
-function buildActions(item) {
-    let a = '';
-    const p = item.path;
-    const n = esc(item.name);
-    if (!item.isFolder) {
-        if (isImage(item.name)) a += `<button onclick="event.stopPropagation();openPreview('${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Preview"><i data-lucide="eye" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
-        a += `<button onclick="event.stopPropagation();verifyFile('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Verifikasi"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i></button>`;
-        a += `<a href="/api/download?path=${encodeURIComponent(p)}" onclick="event.stopPropagation()" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5 text-dark-400"></i></a>`;
-        if (isImage(item.name)) a += `<button onclick="event.stopPropagation();openCompressModal('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Kompres"><i data-lucide="image" class="w-3.5 h-3.5 text-emerald-400"></i></button>`;
-        a += `<button onclick="event.stopPropagation();openShareModal('${p}','${n}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Share"><i data-lucide="link" class="w-3.5 h-3.5 text-cyan-400"></i></button>`;
+function thumbBox(item, boxCls) {
+    const icon = getFileIcon(item.name, item.isFolder);
+    const color = getFileColor(item.name, item.isFolder);
+    if (!item.isFolder && isImage(item.name)) {
+        return `<div class="${boxCls} relative overflow-hidden bg-raised">
+            <div class="absolute inset-0 flex items-center justify-center"><i data-lucide="${icon}" class="w-5 h-5 ${color}"></i></div>
+            <img src="/api/thumbnail?path=${encodeURIComponent(item.path)}" loading="lazy" alt="" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">
+        </div>`;
     }
-    a += `<button onclick="event.stopPropagation();openMoveModal('${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Pindah/Salin"><i data-lucide="move" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
-    a += `<button onclick="event.stopPropagation();openRenameModal('${n}','${p}')" class="p-2 rounded-lg hover:bg-dark-700 transition-colors" title="Rename"><i data-lucide="pencil" class="w-3.5 h-3.5 text-dark-400"></i></button>`;
-    a += `<button onclick="event.stopPropagation();openDeleteModal('${n}','${p}')" class="p-2 rounded-lg hover:bg-red-500/10 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>`;
-    return a;
+    return `<div class="${boxCls} bg-raised flex items-center justify-center"><i data-lucide="${icon}" class="w-5 h-5 ${color}"></i></div>`;
 }
+
+function renderFiles() {
+    const container = document.getElementById('fileList');
+    const items = lastItems;
+    const parentEnc = currentPath ? encode(currentPath.split('/').slice(0, -1).join('/')) : '';
+    let html = '';
+
+    if (!items.length && !currentPath) {
+        html = '<div class="p-16 text-center text-muted"><i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Folder kosong</p><p class="text-xs text-faint mt-1">Mulai upload file!</p></div>';
+        container.innerHTML = html;
+        lucide.createIcons();
+        return;
+    }
+    if (!items.length && currentPath) {
+        html = '<div class="p-12 text-center text-muted"><p class="text-sm">Folder kosong</p></div>';
+        container.innerHTML = html;
+        lucide.createIcons();
+        return;
+    }
+
+    if (viewMode === 'grid') {
+        html = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 p-3 sm:p-4">';
+        if (parentEnc) {
+            html += `<div class="cursor-pointer bg-raised/50 hover:bg-raised border border-border rounded-xl flex flex-col items-center justify-center gap-2 py-8 transition-colors" onclick="navigateTo('${parentEnc}')">
+                <i data-lucide="arrow-left" class="w-6 h-6 text-muted"></i><span class="text-xs font-medium text-muted">Kembali</span></div>`;
+        }
+        items.forEach((item, idx) => {
+            const checked = selectedPaths.has(item.path);
+            const rowOnclick = item.isFolder ? `navigateTo('${item.path}')` : (isImage(item.name) ? `openPreview('${item.path}')` : '');
+            html += `<div class="group relative bg-surface border border-border rounded-xl overflow-hidden cursor-pointer transition hover:shadow-md hover:border-faint anim-in" onclick="${rowOnclick}">
+                <div class="relative aspect-[4/3] bg-bg">
+                    ${thumbBox(item, 'absolute inset-0 w-full h-full')}
+                    ${selectMode ? `<input type="checkbox" ${checked ? 'checked' : ''} class="absolute top-2 left-2 w-4 h-4 cursor-pointer" onclick="event.stopPropagation();toggleSelect('${item.path}')">` : ''}
+                </div>
+                <div class="px-3 py-2">
+                    <p class="text-xs font-medium truncate" title="${esc(item.name)}">${esc(item.name)}</p>
+                    <p class="text-[10px] text-faint mt-0.5">${item.sizeFormatted}${item.hash ? ' <span class="text-ok" title="Hash verified"><i data-lucide="shield-check" class="w-2.5 h-2.5 inline"></i></span>' : ''}</p>
+                </div>
+                <button data-row-trigger onclick="event.stopPropagation();openRowMenu(event,${idx})" aria-label="Aksi" class="absolute top-1.5 right-1.5 w-8 h-8 inline-flex items-center justify-center rounded-lg bg-surface/80 border border-border text-muted hover:bg-raised transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+            </div>`;
+        });
+        html += '</div>';
+    } else {
+        if (parentEnc) {
+            html += `<div class="flex items-center gap-3 px-3 sm:px-4 py-3 hover:bg-raised/60 cursor-pointer border-b border-border/60 transition-colors" onclick="navigateTo('${parentEnc}')">
+                <div class="w-9 h-9 rounded-lg bg-raised flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-muted"></i></div>
+                <span class="text-sm font-medium text-muted">Kembali</span></div>`;
+        }
+        items.forEach((item, idx) => {
+            const checked = selectedPaths.has(item.path);
+            const rowOnclick = item.isFolder ? `navigateTo('${item.path}')` : (isImage(item.name) ? `openPreview('${item.path}')` : '');
+            html += `<div class="group flex items-center gap-3 px-3 sm:px-4 py-2.5 hover:bg-raised/60 border-b border-border/60 transition-colors anim-in ${checked ? 'bg-accent/5 hover:bg-accent/5' : ''}" onclick="${rowOnclick}">
+                ${selectMode ? `<input type="checkbox" ${checked ? 'checked' : ''} class="w-4 h-4 shrink-0 cursor-pointer" onclick="event.stopPropagation();toggleSelect('${item.path}')">` : ''}
+                ${thumbBox(item, 'w-10 h-10 rounded-lg shrink-0')}
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate leading-tight" title="${esc(item.name)}">${esc(item.name)}</p>
+                    <p class="text-[11px] text-faint">${item.sizeFormatted}${item.hash ? ' <span class="text-ok" title="Hash verified"><i data-lucide="shield-check" class="w-2.5 h-2.5 inline"></i></span>' : ''}</p>
+                </div>
+                <div class="flex items-center gap-0.5 shrink-0">
+                    ${!item.isFolder ? `<a href="/api/download?path=${encodeURIComponent(item.path)}" onclick="event.stopPropagation()" class="w-7 h-7 sm:w-8 sm:h-8 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors" title="Download" aria-label="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></a>` : ''}
+                    <button data-row-trigger onclick="event.stopPropagation();openRowMenu(event,${idx})" aria-label="Aksi lainnya" class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-muted hover:bg-raised transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+            </div>`;
+        });
+    }
+    container.innerHTML = html;
+    lucide.createIcons();
+}
+
+function buildMenuHTML(item) {
+    const p = item.path;
+    function mi(icon, label, cls, action) {
+        return `<button onclick="event.stopPropagation();closeRowMenu();${action}" class="w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm rounded-lg hover:bg-raised transition-colors ${cls || ''}">
+            <i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i><span class="truncate">${label}</span></button>`;
+    }
+    let h = '';
+    if (!item.isFolder) {
+        if (isImage(item.name)) h += mi('eye', 'Preview', '', `openPreview('${p}')`);
+        h += mi('download', 'Download', '', `window.location.href='/api/download?path=${encodeURIComponent(p)}'`);
+        h += mi('shield-check', 'Verifikasi', 'text-ok', `verifyFile('${p}')`);
+        if (isImage(item.name)) h += mi('image', 'Kompres', 'text-ok', `openCompressModal('${p}')`);
+        h += mi('link', 'Share', 'text-accent', `openShareModal('${p}')`);
+    } else {
+        h += mi('folder-open', 'Buka', '', `navigateTo('${p}')`);
+    }
+    h += mi('move', 'Pindah / Salin', '', `openMoveModal('${p}')`);
+    h += mi('pencil', 'Ubah Nama', '', `openRenameModal('${p}')`);
+    h += mi('trash-2', 'Hapus', 'text-danger', `openDeleteModal('${p}')`);
+    return h;
+}
+
+function openRowMenu(e, idx) {
+    e.stopPropagation();
+    const item = lastItems[idx];
+    if (!item) return;
+    const menu = document.getElementById('rowMenu');
+    menu.innerHTML = buildMenuHTML(item);
+    menu.classList.remove('hidden');
+    const r = e.currentTarget.getBoundingClientRect();
+    menu.style.left = '0px'; menu.style.top = '0px';
+    const mw = menu.offsetWidth, mh = menu.offsetHeight;
+    let left = Math.max(8, Math.min(r.right - 8, window.innerWidth - mw - 8));
+    let top = r.bottom + 6;
+    if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 6);
+    menu.style.left = left + 'px'; menu.style.top = top + 'px';
+    lucide.createIcons();
+}
+function closeRowMenu() { const m = document.getElementById('rowMenu'); m.classList.add('hidden'); m.innerHTML = ''; }
 
 function updateBreadcrumb(p) {
     const parts = p.split('/').filter(Boolean);
-    let html = `<span onclick="navigateTo('')" class="px-2 py-1 rounded-md hover:bg-dark-800 cursor-pointer transition-colors ${!parts.length ? 'text-blue-400 font-semibold' : 'text-dark-500'}">/</span>`;
+    let html = `<span onclick="navigateTo('')" class="px-2 py-1 rounded-md hover:bg-raised cursor-pointer transition-colors ${!parts.length ? 'text-accent font-semibold' : 'text-muted'}">/</span>`;
     let acc = '';
     parts.forEach(part => {
         acc += (acc ? '/' : '') + part;
-        html += `<i data-lucide="chevron-right" class="w-3 h-3 text-dark-600 shrink-0"></i><span onclick="navigateTo('${encode(acc)}')" class="px-2 py-1 rounded-md hover:bg-dark-800 cursor-pointer transition-colors ${acc === p ? 'text-blue-400 font-semibold' : 'text-dark-500'}">${esc(part)}</span>`;
+        html += `<i data-lucide="chevron-right" class="w-3 h-3 text-faint shrink-0"></i><span onclick="navigateTo('${encode(acc)}')" class="px-2 py-1 rounded-md hover:bg-raised cursor-pointer transition-colors ${acc === p ? 'text-accent font-semibold' : 'text-muted'}">${esc(part)}</span>`;
     });
     document.getElementById('breadcrumb').innerHTML = html;
     lucide.createIcons();
@@ -675,9 +913,10 @@ function handleFileSelect() {
 function showUploadConfirm() {
     document.getElementById('uploadCountText').textContent = pendingFiles.length + ' file';
     let html = '';
-    pendingFiles.forEach(f => { html += `<div class="flex items-center gap-2 py-1.5"><i data-lucide="${getFileIcon(f.name, false)}" class="w-3.5 h-3.5 ${getFileColor(f.name, false)} shrink-0"></i><span class="truncate">${esc(f.webkitRelativePath || f.name)}</span><span class="text-dark-600 shrink-0 ml-auto">${(f.size / 1024 / 1024).toFixed(2)} MB</span></div>`; });
+    pendingFiles.forEach(f => { html += `<div class="flex items-center gap-2 py-1.5"><i data-lucide="${getFileIcon(f.name, false)}" class="w-3.5 h-3.5 ${getFileColor(f.name, false)} shrink-0"></i><span class="truncate">${esc(f.webkitRelativePath || f.name)}</span><span class="text-faint shrink-0 ml-auto">${(f.size / 1024 / 1024).toFixed(2)} MB</span></div>`; });
     document.getElementById('uploadFileList').innerHTML = html;
     openModal('uploadConfirmModal');
+    lucide.createIcons();
 }
 
 async function confirmUpload() {
@@ -732,7 +971,7 @@ async function submitMkdir() {
     } catch (e) { toast(e.message); }
 }
 
-function openRenameModal(name, p) { document.getElementById('newNameInput').value = name; document.getElementById('renamePath').value = p; openModal('renameModal'); setTimeout(() => document.getElementById('newNameInput').focus(), 100); }
+function openRenameModal(p) { document.getElementById('newNameInput').value = decode(p).split('/').pop(); document.getElementById('renamePath').value = p; openModal('renameModal'); setTimeout(() => document.getElementById('newNameInput').focus(), 100); }
 async function submitRename() {
     const name = document.getElementById('newNameInput').value.trim();
     if (!name) return toast('Masukkan nama baru');
@@ -743,45 +982,75 @@ async function submitRename() {
     } catch (e) { toast(e.message); }
 }
 
-function openDeleteModal(name, p) { document.getElementById('deleteName').textContent = name; document.getElementById('deletePath').value = p; openModal('deleteModal'); }
+function openDeleteModal(p) { document.getElementById('deleteName').textContent = decode(p).split('/').pop(); document.getElementById('deletePath').value = p; deleteBatchMode = false; openModal('deleteModal'); }
 async function submitDelete() {
     try {
-        const res = await fetch('/api/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('deletePath').value }) });
-        const data = await res.json();
-        if (data.success) { closeModal('deleteModal'); loadFiles(); toast('Dihapus!'); } else toast(data.message);
+        let data, reloaded = false;
+        if (deleteBatchMode) {
+            const res = await fetch('/api/batch-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths) }) });
+            data = await res.json();
+            if (data.success) { selectedPaths.clear(); toggleSelectMode(); toast(data.deleted + ' item dihapus'); reloaded = true; }
+        } else {
+            const res = await fetch('/api/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('deletePath').value }) });
+            data = await res.json();
+            if (data.success) toast('Dihapus!');
+        }
+        if (data.success) { closeModal('deleteModal'); if (!reloaded) loadFiles(); } else toast(data.message);
     } catch (e) { toast(e.message); }
 }
 
-function openMoveModal(p) { document.getElementById('moveSource').value = p; document.getElementById('moveTargetInput').value = ''; openModal('moveModal'); }
+function openMoveModal(p) {
+    document.getElementById('moveSource').value = p || '';
+    document.getElementById('moveTargetInput').value = '';
+    moveBatchMode = typeof p === 'undefined' || !p;
+    const copyBtn = document.getElementById('moveCopyBtn');
+    if (copyBtn) copyBtn.classList.toggle('hidden', moveBatchMode);
+    openModal('moveModal');
+}
+function batchMove() { openMoveModal(); }
 async function submitAction(action) {
     const dest = document.getElementById('moveTargetInput').value.trim();
     if (!dest) return toast('Masukkan path tujuan');
     try {
-        const res = await fetch('/api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: document.getElementById('moveSource').value, destination: encode(dest) }) });
-        const data = await res.json();
-        if (data.success) { closeModal('moveModal'); loadFiles(); toast(action === 'move' ? 'Dipindah!' : 'Disalin!'); } else toast(data.message);
+        let data, reloaded = false;
+        if (moveBatchMode && action === 'move') {
+            const res = await fetch('/api/batch-move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths), destination: encode(dest) }) });
+            data = await res.json();
+            if (data.success) { selectedPaths.clear(); toggleSelectMode(); toast(data.moved + ' item dipindah'); reloaded = true; }
+        } else {
+            const res = await fetch('/api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: document.getElementById('moveSource').value, destination: encode(dest) }) });
+            data = await res.json();
+            if (data.success) toast(action === 'move' ? 'Dipindah!' : 'Disalin!');
+        }
+        if (data.success) { closeModal('moveModal'); if (!reloaded) loadFiles(); } else toast(data.message);
     } catch (e) { toast(e.message); }
 }
 
-async function verifyFile(p, name) {
+async function verifyFile(p) {
     try {
         const res = await fetch('/api/verify?path=' + encodeURIComponent(p));
         const d = await res.json();
-        const statusColor = d.status === 'valid' ? 'text-emerald-400' : d.status === 'corrupted' ? 'text-red-400' : 'text-amber-400';
+        const name = decode(p).split('/').pop();
+        const statusColor = d.status === 'valid' ? 'text-ok' : d.status === 'corrupted' ? 'text-danger' : 'text-warn';
         const statusText = d.status === 'valid' ? 'Aman' : d.status === 'corrupted' ? 'Rusak' : 'Belum di-scan';
-        const statusBg = d.status === 'valid' ? 'bg-emerald-500/10' : d.status === 'corrupted' ? 'bg-red-500/10' : 'bg-amber-500/10';
-        let html = `<div class="bg-dark-800 rounded-xl p-3 mb-3"><div class="font-semibold text-sm mb-1">${esc(name)}</div><span class="inline-flex items-center gap-1 text-xs font-bold ${statusColor} ${statusBg} px-2 py-1 rounded-lg">${statusText}</span></div>`;
-        if (d.originalHash) { html += `<div class="bg-dark-800 rounded-xl p-3 mb-2"><div class="text-[10px] text-dark-500 mb-1">Hash Asli</div><code class="text-[10px] break-all text-dark-300">${d.originalHash}</code></div>`; html += `<div class="bg-dark-800 rounded-xl p-3 mb-2"><div class="text-[10px] text-dark-500 mb-1">Hash Saat Ini</div><code class="text-[10px] break-all text-dark-300">${d.currentHash}</code></div>`; }
-        if (d.uploadedBy) html += `<div class="text-dark-500 text-xs">Oleh <strong class="text-dark-300">${d.uploadedBy}</strong> &bull; ${new Date(d.uploadedAt).toLocaleString('id-ID')}</div>`;
+        const statusBg = d.status === 'valid' ? 'bg-ok/10' : d.status === 'corrupted' ? 'bg-danger/10' : 'bg-warn/10';
+        let html = `<div class="bg-raised/70 rounded-xl p-3 mb-3"><div class="font-semibold text-sm mb-1">${esc(name)}</div><span class="inline-flex items-center gap-1 text-xs font-bold ${statusColor} ${statusBg} px-2 py-1 rounded-lg">${statusText}</span></div>`;
+        if (d.originalHash) { html += `<div class="bg-raised/70 rounded-xl p-3 mb-2"><div class="text-[10px] text-faint mb-1">Hash Asli</div><code class="text-[10px] break-all text-muted">${d.originalHash}</code></div>`; html += `<div class="bg-raised/70 rounded-xl p-3 mb-2"><div class="text-[10px] text-faint mb-1">Hash Saat Ini</div><code class="text-[10px] break-all text-muted">${d.currentHash}</code></div>`; }
+        if (d.uploadedBy) html += `<div class="text-faint text-xs">Oleh <strong class="text-muted">${d.uploadedBy}</strong> &bull; ${new Date(d.uploadedAt).toLocaleString('id-ID')}</div>`;
         document.getElementById('infoContent').innerHTML = html;
         openModal('infoModal');
     } catch (e) { toast(e.message); }
 }
 
-function openPreview(p) { document.getElementById('previewImg').src = '/api/preview?path=' + encodeURIComponent(p); document.getElementById('previewOverlay').classList.remove('hidden'); }
+function openPreview(p) {
+    document.getElementById('previewImg').src = '/api/preview?path=' + encodeURIComponent(p);
+    try { document.getElementById('previewName').textContent = decode(p).split('/').pop(); } catch {}
+    document.getElementById('previewDl').href = '/api/download?path=' + encodeURIComponent(p);
+    document.getElementById('previewOverlay').classList.remove('hidden');
+}
 function closePreview() { document.getElementById('previewOverlay').classList.add('hidden'); }
 
-function openCompressModal(p, name) { document.getElementById('compressName').textContent = name; document.getElementById('compressPath').value = p; openModal('compressModal'); }
+function openCompressModal(p) { document.getElementById('compressName').textContent = decode(p).split('/').pop(); document.getElementById('compressPath').value = p; openModal('compressModal'); }
 async function submitCompress() {
     try {
         const res = await fetch('/api/compress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('compressPath').value, quality: parseInt(document.getElementById('compressQuality').value) || 75 }) });
@@ -790,7 +1059,7 @@ async function submitCompress() {
     } catch (e) { toast(e.message); }
 }
 
-function openShareModal(p, name) { document.getElementById('shareName').textContent = name; document.getElementById('sharePath').value = p; document.getElementById('shareResult').classList.add('hidden'); openModal('shareModal'); }
+function openShareModal(p) { document.getElementById('shareName').textContent = decode(p).split('/').pop(); document.getElementById('sharePath').value = p; document.getElementById('shareResult').classList.add('hidden'); openModal('shareModal'); }
 async function submitShare() {
     try {
         const res = await fetch('/api/share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: document.getElementById('sharePath').value, expiresIn: parseInt(document.getElementById('shareExpiry').value) || 0 }) });
@@ -803,14 +1072,17 @@ function copyShareLink() { navigator.clipboard.writeText(document.getElementById
 function toggleSelectMode() {
     selectMode = !selectMode;
     selectedPaths.clear();
-    document.getElementById('selectModeBtn').classList.toggle('bg-blue-600/20', selectMode);
+    const btn = document.getElementById('selectModeBtn');
+    btn.classList.toggle('bg-accent/15', selectMode);
+    btn.classList.toggle('text-accent', selectMode);
+    btn.classList.toggle('border-accent/40', selectMode);
+    btn.classList.toggle('text-muted', !selectMode);
     if (!selectMode) document.getElementById('batchBar').classList.add('hidden');
     loadFiles();
 }
 function toggleSelect(p) { if (selectedPaths.has(p)) selectedPaths.delete(p); else selectedPaths.add(p); document.getElementById('batchCount').textContent = selectedPaths.size; document.getElementById('batchBar').classList.toggle('hidden', !selectedPaths.size); }
-async function batchDelete() { if (!confirm('Hapus ' + selectedPaths.size + ' item?')) return; try { const r = await fetch('/api/batch-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths) }) }); const d = await r.json(); if (d.success) { selectedPaths.clear(); toggleSelectMode(); loadFiles(); toast(d.deleted + ' item dihapus'); } } catch {} }
-async function batchMove() { const dest = prompt('Path tujuan:'); if (!dest) return; try { const r = await fetch('/api/batch-move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paths: Array.from(selectedPaths), destination: encode(dest) }) }); const d = await r.json(); if (d.success) { selectedPaths.clear(); toggleSelectMode(); loadFiles(); toast(d.moved + ' item dipindah'); } } catch {} }
-async function batchHash() { for (const p of selectedPaths) { try { await fetch('/api/recalc-hash', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: p }) }); } catch {} } toast('Hash dihitung!'); loadFiles(); }
+function batchDelete() { if (!selectedPaths.size) return; deleteBatchMode = true; document.getElementById('deleteName').textContent = selectedPaths.size + ' item'; document.getElementById('deletePath').value = ''; openModal('deleteModal'); }
+function batchHash() { if (!selectedPaths.size) return; for (const p of selectedPaths) { try { fetch('/api/recalc-hash', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: p }) }); } catch {} } toast('Hash dihitung!'); selectedPaths.clear(); toggleSelectMode(); }
 
 async function loadUsers() {
     if (!currentUserData || currentUserData.role !== 'admin') return;
@@ -819,8 +1091,8 @@ async function loadUsers() {
         const d = await res.json();
         if (!d.success) return;
         let html = '';
-        d.users.forEach(u => { html += `<div class="flex items-center justify-between bg-dark-800/50 rounded-xl px-4 py-3 border border-dark-700/50"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-dark-400"></i></div><div><p class="text-sm font-medium">${esc(u.username)}</p><p class="text-[10px] text-dark-500">${u.role === 'admin' ? 'Admin' : 'User'}</p></div></div>${u.username !== 'admin' ? `<button onclick="deleteUser(${u.id})" class="p-2 rounded-lg hover:bg-red-500/10 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>` : ''}</div>`; });
-        document.getElementById('usersList').innerHTML = html || '<p class="text-xs text-dark-500 text-center py-4">Belum ada user</p>';
+        d.users.forEach(u => { html += `<div class="flex items-center justify-between bg-raised/60 rounded-xl px-4 py-3 border border-border/60"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-raised flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-muted"></i></div><div><p class="text-sm font-medium">${esc(u.username)}</p><p class="text-[10px] text-faint">${u.role === 'admin' ? 'Admin' : 'User'}</p></div></div><div class="flex items-center gap-1"><button onclick="editUser(${u.id})" class="w-8 h-8 inline-flex items-center justify-center rounded-lg hover:bg-accent/10 transition-colors" aria-label="Ganti user & pass"><i data-lucide="key" class="w-3.5 h-3.5 text-warn"></i></button>${u.username !== 'admin' ? `<button onclick="deleteUser(${u.id})" class="w-8 h-8 inline-flex items-center justify-center rounded-lg hover:bg-danger/10 transition-colors" aria-label="Hapus user"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-danger"></i></button>` : ''}</div></div>`; });
+        document.getElementById('usersList').innerHTML = html || '<p class="text-xs text-muted text-center py-4">Belum ada user</p>';
         lucide.createIcons();
     } catch {}
 }
@@ -835,14 +1107,43 @@ async function createUser() {
 }
 async function deleteUser(id) { if (!confirm('Hapus user ini?')) return; try { const r = await fetch('/api/users/' + id, { method: 'DELETE' }); const d = await r.json(); if (d.success) { loadUsers(); toast('User dihapus'); } } catch {} }
 
+function editUser(id) {
+    fetch('/api/users').then(r => r.json()).then(d => {
+        target = d.users.find(u => u.id === id);
+        if (!target) return;
+        document.getElementById('editUserId').value = target.id;
+        document.getElementById('editUsername').value = target.username;
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editRole').value = target.role;
+        openModal('editUserModal');
+    }).catch(() => toast('Gagal mengambil data user'));
+}
+async function saveUser() {
+    const id = document.getElementById('editUserId').value;
+    const username = document.getElementById('editUsername').value.trim();
+    const password = document.getElementById('editPassword').value;
+    const role = document.getElementById('editRole').value;
+    if (!username) return toast('Username wajib diisi');
+    try {
+        const res = await fetch('/api/users/' + id, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, role }) });
+        const d = await res.json();
+        if (d.success) {
+            closeModal('editUserModal');
+            loadUsers();
+            if (currentUserData && Number(id) === currentUserData.id) { currentUserData.username = username; document.getElementById('currentUser').textContent = username; }
+            toast('Berhasil diubah!');
+        } else toast(d.message);
+    } catch (e) { toast(e.message); }
+}
+
 async function loadShares() {
     try {
         const res = await fetch('/api/shares');
         const d = await res.json();
         document.getElementById('statShares').textContent = d.shares.length;
-        if (!d.shares.length) { document.getElementById('sharesList').innerHTML = '<p class="text-xs text-dark-500 text-center py-6">Belum ada share link</p>'; return; }
+        if (!d.shares.length) { document.getElementById('sharesList').innerHTML = '<p class="text-xs text-muted text-center py-6">Belum ada share link</p>'; return; }
         let html = '';
-        d.shares.forEach(s => { html += `<div class="bg-dark-800/50 rounded-xl p-3 border border-dark-700/50"><div class="text-xs font-medium truncate mb-1">${esc(s.path)}</div><div class="text-[10px] text-dark-500 mb-2">${esc(s.createdBy)} &bull; ${new Date(s.createdAt).toLocaleString('id-ID')}</div><div class="flex gap-2"><button onclick="navigator.clipboard.writeText('${s.url}').then(()=>toast('Disalin!'))" class="px-3 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-[11px] font-medium transition-colors">Copy</button><button onclick="deleteShare('${s.token}')" class="px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-[11px] font-medium text-red-400 transition-colors">Hapus</button></div></div>`; });
+        d.shares.forEach(s => { html += `<div class="bg-raised/60 rounded-xl p-3 border border-border/60"><div class="text-xs font-medium truncate mb-1">${esc(s.path)}</div><div class="text-[10px] text-faint mb-2">${esc(s.createdBy)} &bull; ${new Date(s.createdAt).toLocaleString('id-ID')}</div><div class="flex gap-2"><button onclick="navigator.clipboard.writeText('${s.url}').then(()=>toast('Disalin!'))" class="px-3 py-1.5 rounded-lg bg-raised hover:bg-border text-[11px] font-medium transition-colors">Copy</button><button onclick="deleteShare('${s.token}')" class="px-3 py-1.5 rounded-lg hover:bg-danger/10 text-[11px] font-medium text-danger transition-colors">Hapus</button></div></div>`; });
         document.getElementById('sharesList').innerHTML = html;
     } catch {}
 }
@@ -856,12 +1157,12 @@ async function doSearch() {
         const res = await fetch('/api/search?q=' + encodeURIComponent(q));
         const d = await res.json();
         const container = document.getElementById('fileList');
-        if (!d.results.length) { container.innerHTML = '<div class="p-12 text-center text-dark-500"><i data-lucide="search-x" class="w-8 h-8 mx-auto mb-3 opacity-30"></i><p class="text-sm">Tidak ditemukan</p></div>'; lucide.createIcons(); return; }
-        let html = `<div class="px-4 py-2.5 text-[11px] text-dark-500 border-b border-dark-700/30">${d.results.length} hasil ditemukan</div>`;
+        if (!d.results.length) { container.innerHTML = '<div class="p-12 text-center text-muted"><i data-lucide="search-x" class="w-8 h-8 mx-auto mb-3 opacity-30"></i><p class="text-sm">Tidak ditemukan</p></div>'; lucide.createIcons(); return; }
+        let html = `<div class="px-4 py-2.5 text-[11px] text-faint border-b border-border/60">${d.results.length} hasil ditemukan</div>`;
         d.results.forEach(item => {
-            html += `<div class="flex items-center gap-3 px-4 py-3 hover:bg-dark-800/50 border-b border-dark-700/30 cursor-pointer transition-colors" onclick="${item.isFolder ? `navigateTo('${item.encodedPath}')` : ''}">
-                <div class="w-9 h-9 rounded-lg bg-dark-800/80 flex items-center justify-center shrink-0"><i data-lucide="${getFileIcon(item.name, item.isFolder)}" class="w-4 h-4 ${getFileColor(item.name, item.isFolder)}"></i></div>
-                <div class="min-w-0"><p class="text-sm font-medium truncate">${esc(item.name)}</p><p class="text-[11px] text-dark-500 font-mono">${esc(item.relPath)}</p></div>
+            html += `<div class="flex items-center gap-3 px-3 sm:px-4 py-3 hover:bg-raised/60 border-b border-border/60 cursor-pointer transition-colors" onclick="${item.isFolder ? `navigateTo('${item.encodedPath}')` : ''}">
+                <div class="w-9 h-9 rounded-lg bg-raised flex items-center justify-center shrink-0"><i data-lucide="${getFileIcon(item.name, item.isFolder)}" class="w-4 h-4 ${getFileColor(item.name, item.isFolder)}"></i></div>
+                <div class="min-w-0"><p class="text-sm font-medium truncate">${esc(item.name)}</p><p class="text-[11px] text-faint font-mono">${esc(item.relPath)}</p></div>
             </div>`;
         });
         container.innerHTML = html;
@@ -925,7 +1226,21 @@ async function sendTelegramReport() {
     } catch (e) { toast(e.message); }
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePreview(); document.querySelectorAll('.fixed:not(#toast):not(#previewOverlay)').forEach(el => { if (!el.classList.contains('hidden') && el.classList.contains('backdrop-blur-sm')) el.classList.add('hidden'); }); } });
+document.addEventListener('click', e => {
+    if (!e.target.closest('#rowMenu') && !e.target.closest('[data-row-trigger]')) closeRowMenu();
+    if (!e.target.closest('#headerMenuWrap')) closeHeaderMenu();
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closePreview();
+        closeRowMenu();
+        closeHeaderMenu();
+        toggleSidebar(false);
+        document.querySelectorAll('.modal-overlay').forEach(el => { if (el.id && !el.classList.contains('hidden')) closeModal(el.id); });
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => { init(); loadShares(); setInterval(() => { if (!document.getElementById('searchInput').value.trim()) loadFiles(); loadShares(); }, 30000); });
 </script>
 </body>
