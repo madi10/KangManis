@@ -10,8 +10,13 @@ const os = require('os');
 const http = require('http');
 const https = require('https');
 
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
+const CONFIG_FILE = path.join(__dirname, 'config.json');
+const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
 const app = express();
+
+function saveConfig() {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+}
 const PORT = config.port || 8080;
 const BASE_DIR = config.baseDir || path.join(os.homedir(), 'KangManis');
 const USERS_FILE = path.join(__dirname, 'users.json');
@@ -196,10 +201,10 @@ function recalcMetaHash(dir) {
     } catch {}
 }
 
-async function sendTelegram(text) {
-    const token = config.telegramBotToken;
-    const chatId = config.telegramChatId;
-    if (!token || !chatId) return;
+async function sendTelegram(text, tokenOverride, chatIdOverride) {
+    const token = tokenOverride || config.telegramBotToken;
+    const chatId = chatIdOverride || config.telegramChatId;
+    if (!token || !chatId) return { ok: false, description: 'Bot token / Chat ID belum diatur' };
     try {
         const postData = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' });
         const options = {
@@ -209,13 +214,23 @@ async function sendTelegram(text) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(postData) }
         };
-        await new Promise((resolve, reject) => {
-            const req = https.request(options, res => { res.resume(); res.on('end', resolve); });
+        const body = await new Promise((resolve, reject) => {
+            const req = https.request(options, res => {
+                let data = '';
+                res.on('data', d => data += d);
+                res.on('end', () => resolve({ status: res.statusCode, data }));
+            });
             req.on('error', reject);
             req.write(postData);
             req.end();
         });
-    } catch {}
+        let parsed = {};
+        try { parsed = JSON.parse(body.data); } catch {}
+        if (body.status === 200 && parsed.ok) return { ok: true };
+        return { ok: false, description: parsed.description || ('HTTP ' + body.status) };
+    } catch (e) {
+        return { ok: false, description: e.message };
+    }
 }
 
 async function getStorageInfo() {
@@ -271,7 +286,11 @@ app.get('/', authRequired, (req, res) => {
 });
 
 app.get('/api/me', authRequired, (req, res) => {
-    res.json({ success: true, user: req.session.user });
+    res.json({ success: true, user: req.session.user, appName: config.appName || 'KangManis' });
+});
+
+app.get('/api/app-info', (req, res) => {
+    res.json({ success: true, appName: config.appName || 'KangManis' });
 });
 
 app.get('/api/files', authRequired, (req, res) => {
@@ -558,7 +577,8 @@ app.get('/api/thumbnail', authRequired, async (req, res) => {
     if (!file.startsWith(BASE_DIR) || !fs.existsSync(file)) return res.status(404).end();
     try {
         const sharp = require('sharp');
-        const thumb = await sharp(file).resize(200, 200, { fit: 'cover' }).jpeg({ quality: 70 }).toBuffer();
+        const size = config.imageSizes?.thumbnail || 200;
+        const thumb = await sharp(file).resize(size, size, { fit: 'cover' }).jpeg({ quality: 70 }).toBuffer();
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Cache-Control', 'public, max-age=3600');
         res.end(thumb);
@@ -784,6 +804,77 @@ app.post('/api/batch-compress', authRequired, async (req, res) => {
         }
         res.json({ success: true, compressed, saved: totalSaved, savedFormatted: formatBytes(totalSaved) });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/settings', authRequired, adminRequired, (req, res) => {
+    res.json({
+        success: true,
+        settings: {
+            appName: config.appName || 'KangManis',
+            maxUploadSize: config.maxUploadSize ?? 500,
+            imageQuality: config.imageQuality ?? 80,
+            imageSizes: {
+                thumbnail: config.imageSizes?.thumbnail ?? 200,
+                preview: config.imageSizes?.preview ?? 1920
+            },
+            telegramBotToken: config.telegramBotToken || '',
+            telegramChatId: config.telegramChatId || '',
+            port: config.port ?? 8080,
+            baseDir: config.baseDir || BASE_DIR,
+            sessionSecret: config.sessionSecret || ''
+        }
+    });
+});
+
+app.post('/api/settings', authRequired, adminRequired, (req, res) => {
+    try {
+        const b = req.body || {};
+        const num = (v, min, max, label) => {
+            const n = Number(v);
+            if (!Number.isFinite(n)) throw new Error(label + ' harus berupa angka');
+            const i = Math.round(n);
+            if (i < min || i > max) throw new Error(label + ' harus antara ' + min + '-' + max);
+            return i;
+        };
+        let restartRequired = false;
+
+        if (b.appName !== undefined) config.appName = String(b.appName).trim() || 'KangManis';
+        if (b.telegramBotToken !== undefined) config.telegramBotToken = String(b.telegramBotToken).trim();
+        if (b.telegramChatId !== undefined) config.telegramChatId = String(b.telegramChatId).trim();
+        if (b.maxUploadSize !== undefined) config.maxUploadSize = num(b.maxUploadSize, 1, 1000000, 'Maks. upload');
+        if (b.imageQuality !== undefined) config.imageQuality = num(b.imageQuality, 1, 100, 'Kualitas gambar');
+        if (b.imageSizes !== undefined) {
+            if (!config.imageSizes) config.imageSizes = {};
+            if (b.imageSizes.thumbnail !== undefined) config.imageSizes.thumbnail = num(b.imageSizes.thumbnail, 16, 4096, 'Ukuran thumbnail');
+            if (b.imageSizes.preview !== undefined) config.imageSizes.preview = num(b.imageSizes.preview, 16, 8192, 'Ukuran preview');
+        }
+        if (b.port !== undefined) {
+            const p = num(b.port, 1, 65535, 'Port');
+            if (p !== config.port) { config.port = p; restartRequired = true; }
+        }
+        if (b.baseDir !== undefined) {
+            const d = String(b.baseDir).trim();
+            if (!d) throw new Error('Lokasi penyimpanan tidak boleh kosong');
+            if (d !== config.baseDir) { config.baseDir = d; restartRequired = true; }
+        }
+        if (b.sessionSecret !== undefined) {
+            const s = String(b.sessionSecret);
+            if (!s) throw new Error('Session secret tidak boleh kosong');
+            if (s !== config.sessionSecret) { config.sessionSecret = s; restartRequired = true; }
+        }
+        saveConfig();
+        res.json({ success: true, restartRequired });
+    } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/telegram-test', authRequired, adminRequired, async (req, res) => {
+    const b = req.body || {};
+    const token = (b.telegramBotToken !== undefined ? String(b.telegramBotToken).trim() : '') || config.telegramBotToken;
+    const chatId = (b.telegramChatId !== undefined ? String(b.telegramChatId).trim() : '') || config.telegramChatId;
+    if (!token || !chatId) return res.status(400).json({ success: false, message: 'Bot token & Chat ID belum diatur' });
+    const result = await sendTelegram('✅ <b>KangManis</b> — tes koneksi Telegram berhasil!', token, chatId);
+    if (result.ok) res.json({ success: true });
+    else res.status(400).json({ success: false, message: result.description || 'Gagal mengirim' });
 });
 
 app.post('/api/telegram-report', authRequired, async (req, res) => {

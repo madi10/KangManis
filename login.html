@@ -80,7 +80,7 @@
             <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-accent/60 shadow-lg shadow-accent/20 mb-4">
                 <i data-lucide="hard-drive" class="w-7 h-7 text-white"></i>
             </div>
-            <h1 class="text-2xl font-bold tracking-tight text-text">KangManis</h1>
+            <h1 id="loginAppName" class="text-2xl font-bold tracking-tight text-text">KangManis</h1>
             <p class="text-sm text-muted mt-1">Backup &amp; Storage Jaringan Lokal</p>
         </div>
 
@@ -175,6 +175,14 @@
         });
 
         document.getElementById('username').focus();
+
+        fetch('/api/app-info').then(r => r.json()).then(d => {
+            if (d && d.success && d.appName) {
+                document.title = d.appName + ' - Login';
+                const el = document.getElementById('loginAppName');
+                if (el) el.textContent = d.appName;
+            }
+        }).catch(() => {});
     </script>
 </body>
 </html>

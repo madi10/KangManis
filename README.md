@@ -15,6 +15,9 @@ KangManis adalah aplikasi file manager self-hosted yang berjalan di server lokal
 - **Move / Copy / Rename / Delete** — operasi file lengkap
 - **Batch Operations** — pilih banyak file sekaligus untuk hapus atau pindah
 - **User Management** — multi-user dengan role admin & user
+- **Pengaturan (Admin)** — atur nama aplikasi, upload, kualitas gambar, server, & Telegram langsung dari UI
+- **Notifikasi Telegram** — log aktivitas upload, rename, hapus, dan pindah file ke chat Telegram
+- **Laporan Storage** — kirim ringkasan storage & share link ke Telegram
 - **Dark & Light Mode** — tema yang dapat ditoggle
 - **Auto-Detect IP** — otomatis mendeteksi IP lokal yang aktif
 - **Responsive UI** — works di desktop dan mobile
@@ -54,7 +57,9 @@ Server akan berjalan di `http://localhost:8080`.
 
 ## Konfigurasi
 
-Edit `config.json` untuk mengubah pengaturan:
+Pengaturan dapat diubah lewat menu **Pengaturan** (ikon gear) di header saat login sebagai admin, atau dengan mengedit `config.json` secara manual.
+
+> Perubahan `port`, `baseDir`, dan `sessionSecret` baru berlaku setelah server di-restart. Mengganti `sessionSecret` akan memaksa semua user login ulang.
 
 ```json
 {
@@ -68,18 +73,25 @@ Edit `config.json` untuk mengubah pengaturan:
   },
   "baseDir": "/sdcard/Download/KangManis",
   "sessionSecret": "ganti-secret-ini",
-  "theme": "dark"
+  "theme": "dark",
+  "telegramBotToken": "",
+  "telegramChatId": ""
 }
 ```
 
 | Field | Deskripsi | Default |
 |-------|-----------|---------|
-| `port` | Port server | `8080` |
+| `appName` | Nama aplikasi (judul & header) | `KangManis` |
+| `port` | Port server (perlu restart) | `8080` |
 | `maxUploadSize` | Maksimal ukuran upload (MB) | `500` |
 | `imageQuality` | Kualitas kompresi gambar (1-100) | `80` |
-| `baseDir` | Lokasi penyimpanan file | `/sdcard/Download/KangManis` |
-| `sessionSecret` | Secret key untuk session | wajib diganti |
+| `imageSizes.thumbnail` | Ukuran thumbnail (px) | `200` |
+| `imageSizes.preview` | Ukuran preview/kompresi (px) | `1920` |
+| `baseDir` | Lokasi penyimpanan file (perlu restart) | `/sdcard/Download/KangManis` |
+| `sessionSecret` | Secret key untuk session (perlu restart) | wajib diganti |
 | `theme` | Tema default (`dark`/`light`) | `dark` |
+| `telegramBotToken` | Token bot Telegram untuk notifikasi & laporan | - |
+| `telegramChatId` | Chat/User ID tujuan Telegram | - |
 
 ## Default Login
 
@@ -101,7 +113,7 @@ http://localhost:8080
 
 ### Akses dari Perangkat Lain (WiFi/LAN)
 
-Server otomatis mendeteksi IP lokal. Lihat IP yang ditampilkan di console saat server启动:
+Server otomatis mendeteksi IP lokal. Lihat IP yang ditampilkan di console saat server dijalankan:
 
 ```
 🚀 KangManis Server Aktif!
@@ -120,6 +132,13 @@ cd kangmanis
 npm install
 npm start
 ```
+
+### Notifikasi & Laporan Telegram
+
+1. Buat bot lewat [@BotFather](https://t.me/BotFather) dan salin **Bot Token**.
+2. Kirim pesan apa pun ke bot, lalu ambil **Chat ID** (mis. lewat `https://api.telegram.org/bot<TOKEN>/getUpdates`).
+3. Login sebagai admin → menu **Pengaturan** → isi **Bot Token** & **Chat/User ID** → klik **Test Kirim** untuk memverifikasi → **Simpan**.
+4. Setelah aktif, setiap aktivitas upload/rename/hapus/pindah akan dikirim otomatis, dan tombol **Laporan Telegram** mengirim ringkasan storage.
 
 ## Struktur Projek
 
@@ -140,6 +159,7 @@ kangmanis/
 | Method | Endpoint | Deskripsi | Auth |
 |--------|----------|-----------|------|
 | POST | `/api/login` | Login | - |
+| GET | `/api/app-info` | Nama aplikasi (publik) | - |
 | GET | `/api/me` | Info user login | Yes |
 | GET | `/api/files` | Daftar file/folder | Yes |
 | POST | `/api/upload` | Upload file | Yes |
@@ -159,6 +179,10 @@ kangmanis/
 | GET | `/api/users` | Daftar user | Admin |
 | POST | `/api/users` | Tambah user | Admin |
 | DELETE | `/api/users/:id` | Hapus user | Admin |
+| GET | `/api/settings` | Ambil pengaturan | Admin |
+| POST | `/api/settings` | Simpan pengaturan | Admin |
+| POST | `/api/telegram-test` | Tes kirim ke Telegram | Admin |
+| POST | `/api/telegram-report` | Kirim laporan storage | Yes |
 
 ## Lisensi
 
