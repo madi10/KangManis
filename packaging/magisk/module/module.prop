@@ -1,0 +1,6 @@
+id=kangmanis
+name=KangManis Storage Server
+version=v3.0.0
+versionCode=30000
+author=madi10
+description=Backup & Storage Jaringan Lokal (Node.js) yang auto-start saat boot. Akses via http://<ip-perangkat>:8080

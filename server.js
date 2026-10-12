@@ -293,6 +293,12 @@ app.get('/api/app-info', (req, res) => {
     res.json({ success: true, appName: config.appName || 'KangManis' });
 });
 
+app.get('/api/capabilities', (req, res) => {
+    let image = false;
+    try { require('sharp'); image = true; } catch {}
+    res.json({ success: true, image });
+});
+
 app.get('/api/files', authRequired, (req, res) => {
     const rel = decodePath(req.query.path || '');
     const dir = path.join(BASE_DIR, rel);

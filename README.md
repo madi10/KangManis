@@ -160,6 +160,7 @@ kangmanis/
 |--------|----------|-----------|------|
 | POST | `/api/login` | Login | - |
 | GET | `/api/app-info` | Nama aplikasi (publik) | - |
+| GET | `/api/capabilities` | Fitur yang tersedia (mis. `image`) | - |
 | GET | `/api/me` | Info user login | Yes |
 | GET | `/api/files` | Daftar file/folder | Yes |
 | POST | `/api/upload` | Upload file | Yes |
@@ -183,6 +184,87 @@ kangmanis/
 | POST | `/api/settings` | Simpan pengaturan | Admin |
 | POST | `/api/telegram-test` | Tes kirim ke Telegram | Admin |
 | POST | `/api/telegram-report` | Kirim laporan storage | Yes |
+
+## Build untuk Android
+
+KangManis dapat dikemas menjadi dua bentuk untuk perangkat Android:
+
+1. **APK** — aplikasi mandiri (WebView + Node.js di dalamnya). Cocok untuk perangkat **non-root** dengan **Android 6.0+**. Data disimpan di `/sdcard/Android/data/com.kangmanis.app/files/KangManis`.
+2. **Magisk Module** — menjalankan server sebagai *service* yang auto-start saat boot. Butuh **root + Magisk** (Android 6.0+). Data default di `/sdcard/Download/KangManis`, dapat diubah lewat menu **Pengaturan**.
+
+> Node.js (nodejs-mobile) hanya menyediakan runtime untuk Android 6.0 ke atas. Android 4 tidak didukung.
+> Modul native **sharp tidak disertakan** pada build Android, sehingga fitur kompresi gambar & thumbnail otomatis nonaktif (`/api/capabilities` melaporkan `image: false`). Semua fitur lain tetap berfungsi.
+
+### ABI yang didukung
+
+`arm64-v8a`, `armeabi-v7a`, `x86_64`.
+
+### Build otomatis (GitHub Actions)
+
+Workflow `.github/workflows/build.yml` berjalan otomatis saat push ke `main` atau `workflow_dispatch`. Artifact yang dihasilkan:
+
+- `kangmanis-apk` — APK debug (dan release bila secret tersedia)
+- `kangmanis-magisk` — satu zip Magisk per ABI (`kangmanis-magisk-<abi>.zip`)
+
+Push tag `v*` (mis. `git tag v3.0.0 && git push --tags`) akan membuat **GitHub Release** berisi semua APK & zip Magisk.
+
+#### Secret untuk signing release APK (opsional)
+
+Agar APK release ditandatangani, tambahkan GitHub Secrets berikut:
+
+| Secret | Deskripsi |
+|--------|-----------|
+| `KEYSTORE_BASE64` | Keystore `.jks` yang di-encode base64 (`base64 -w0 keystore.jks`) |
+| `KEY_STORE_PASSWORD` | Password keystore |
+| `KEY_ALIAS` | Alias key |
+| `KEY_PASSWORD` | Password key |
+
+Bila secret tidak diisi, hanya APK debug yang dibangun.
+
+### Build lokal
+
+Prasyarat: Android SDK, Android NDK r25c, CMake 3.22.1, Node.js 18, `unzip`, `zip`, `patchelf`.
+
+```bash
+# 1. Unduh runtime nodejs-mobile (Android)
+curl -L -o /tmp/nm.zip \
+  https://github.com/nodejs-mobile/nodejs-mobile/releases/download/v18.20.4/nodejs-mobile-v18.20.4-android.zip
+unzip -q /tmp/nm.zip -d /tmp/nm
+export NMDIR=/tmp/nm            # folder yang berisi bin/ dan include/
+export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
+
+# 2. APK
+TARGET=android bash packaging/assemble-payload.sh
+# lalu salin libnode + header + payload ke packaging/android/app/src/main/
+# (lihat langkah "Stage libnode + headers + payload" di workflow), kemudian:
+cd packaging/android && gradle assembleDebug
+
+# 3. Magisk module (menghasilkan zip per ABI)
+bash packaging/magisk/package.sh
+```
+
+### Instalasi Magisk
+
+1. Flash `kangmanis-magisk-<abi>.zip` lewat aplikasi Magisk.
+2. Reboot. Server otomatis berjalan di `http://<ip-perangkat>:8080`.
+3. Ubah lokasi penyimpanan / port / Telegram lewat menu **Pengaturan** (login sebagai admin).
+
+## Struktur Paket Android
+
+```
+packaging/
+├── assemble-payload.sh      # Merakit server + frontend + deps (tanpa sharp)
+├── payload/package.json     # Dependencies runtime Android
+├── android/                 # Projek APK (Gradle + JNI + WebView)
+│   └── app/src/main/
+│       ├── cpp/native-lib.cpp
+│       ├── java/com/kangmanis/app/{MainActivity,NodeService,NodeNative}.java
+│       └── jniLibs/<abi>/libnode.so   # diisi saat build
+└── magisk/
+    ├── module/              # Skeleton module (module.prop, service.sh, ...)
+    ├── launcher/main.cpp    # Executable pemanggil node::Start
+    └── package.sh           # Membangun zip per ABI
+```
 
 ## Lisensi
 

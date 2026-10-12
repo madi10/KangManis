@@ -2,3 +2,13 @@ node_modules/
 users.json
 package-lock.json
 *.bak
+
+# Packaging build artifacts
+packaging/build/
+packaging/android/.gradle/
+packaging/android/build/
+packaging/android/app/build/
+packaging/android/app/.cxx/
+packaging/android/app/src/main/jniLibs/
+packaging/android/app/src/main/cpp/libnode/
+packaging/android/app/src/main/assets/nodejs-project/
